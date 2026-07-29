@@ -1,17 +1,16 @@
 #include "data_manager.h"
-#include "config.h"
 
 struct habit_data load_mock_data() {
     struct habit_data data;
     data.start_date = 1609459200;     
     data.bytes_per_day = 8;             
-    data.days_count = 24;              
+    data.days_count = 3;              
     data.labels_count = 3;              
     data.labels_buffer_count = data.bytes_per_day * 8;
 
     data.labels = malloc(sizeof(char*) * data.labels_buffer_count);
     for (int i = 0; i < data.labels_buffer_count; i++) {
-        if (i < data.labels_count) data.labels[i] = malloc(sizeof(char) * MAX_LABEL_LENGTH);
+        if (i < data.labels_count) data.labels[i] = calloc(MAX_LABEL_LENGTH, sizeof(char));
         else data.labels[i] = NULL;
     }
 
@@ -20,7 +19,7 @@ struct habit_data load_mock_data() {
         data.data[i] = malloc(sizeof(unsigned char) * data.bytes_per_day);
     }
 
-    char str1[] = "linux";
+    char str1[] = "limux";
     char str2[] = "mus";
     char str3[] = "stretching-awareness";
 
@@ -37,14 +36,37 @@ struct habit_data load_mock_data() {
     return data;
 }
 
-void free_allocated_habit_data(struct habit_data data) {
-    for (int i = 0; i < data.labels_buffer_count; i++) {
-        if (data.labels[i] != NULL) free(data.labels[i]);
+void save_data(struct habit_data *data) {
+    int fd = open("../data.bin", O_WRONLY | O_CREAT, 0644);
+    if (fd == -1) {
+        printf("error while opening the file");
+        return;
     }
-    free(data.labels);
 
-    for(int i = 0; i < data.days_count; i++) {
-        free(data.data[i]);
+    write(fd, &data->start_date, sizeof(data->start_date));
+    write(fd, &data->bytes_per_day, sizeof(data->bytes_per_day));
+    write(fd, &data->labels_count, sizeof(data->labels_count));
+    
+    for (int i = 0; i < data->labels_buffer_count; i++) {
+        if (i < data->labels_count) write(fd, data->labels[i], MAX_LABEL_LENGTH);
+        else lseek(fd, MAX_LABEL_LENGTH, SEEK_CUR);
     }
-    free(data.data);
+
+    for (int i = 0; i < data->days_count; i++) {
+        write(fd, data->data[i], data->bytes_per_day);
+    }
+    
+    close(fd);
+}
+
+void free_allocated_habit_data(struct habit_data *data) {
+    for (int i = 0; i < data->labels_buffer_count; i++) {
+        if (data->labels[i] != NULL) free(data->labels[i]);
+    }
+    free(data->labels);
+
+    for(int i = 0; i < data->days_count; i++) {
+        free(data->data[i]);
+    }
+    free(data->data);
 }
