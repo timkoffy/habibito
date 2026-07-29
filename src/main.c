@@ -8,39 +8,20 @@
 #include <signal.h>
 #include <string.h>
 
-volatile sig_atomic_t done = 0;
-
-void interrupt_handler(int signum) {
-    printf("done!\n");
-    done = 1;
-}
-
-struct winsize get_screen_size() {
-    struct winsize ws;
-    int fd;
-
-    fd = open("/dev/tty", O_RDWR);
-    if (fd < 0 || ioctl(fd, TIOCGWINSZ, &ws) < 0) err(8, "/dev/tty");
-    close(fd);
-    return ws;
-}
+#include "../include/painter.h"
+#include "../include/utils.h"
 
 void run() {
+    setup_terminal();
+
     struct winsize ws = get_screen_size();
 
-    struct sigaction action;
-    memset(&action, 0, sizeof(action));
-    action.sa_handler = interrupt_handler;
-    sigaction(SIGTERM, &action, NULL);
-    sigaction(SIGINT, &action, NULL);
+    draw_screen(ws.ws_col, ws.ws_row);
+    fflush(stdout);
     
-    int pid = getpid();
+    while(running) {
 
-    while (!done) {
-        printf("PID: %d\n", pid);
     }
-
-    printf("finished properly!\n");
 }
 
 int main(int argc, char *argv[]) {
