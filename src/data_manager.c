@@ -1,4 +1,5 @@
 #include "data_manager.h"
+#include "config.h"
 
 struct habit_data load_mock_data() {
     struct habit_data data;
@@ -6,12 +7,11 @@ struct habit_data load_mock_data() {
     data.bytes_per_day = 8;             
     data.days_count = 1;              
     data.labels_count = 3;              
-    data.max_label_length = 20;       
     data.labels_buffer_count = data.bytes_per_day * 8;
 
     data.labels = malloc(sizeof(char*) * data.labels_buffer_count);
     for (int i = 0; i < data.labels_buffer_count; i++) {
-        if (i < data.labels_count) data.labels[i] = malloc(sizeof(char) * data.max_label_length);
+        if (i < data.labels_count) data.labels[i] = malloc(sizeof(char) * MAX_LABEL_LENGTH);
         else data.labels[i] = NULL;
     }
 
@@ -20,9 +20,13 @@ struct habit_data load_mock_data() {
         data.data[i] = malloc(sizeof(unsigned char) * data.bytes_per_day);
     }
 
-    data.labels[0] = "linux";
-    data.labels[1] = "music";
-    data.labels[2] = "shower";
+    char str1[] = "linux";
+    char str2[] = "mus";
+    char str3[] = "stretching-awareness";
+
+    memcpy(data.labels[0], str1, sizeof(str1)); 
+    memcpy(data.labels[1], str2, sizeof(str2)); 
+    memcpy(data.labels[2], str3, sizeof(str3)); 
 
     unsigned char tmp = (unsigned char)0x0000;
 

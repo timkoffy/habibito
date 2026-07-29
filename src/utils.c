@@ -25,13 +25,13 @@ void setup_terminal() {
     write(STDOUT_FILENO, "\e[?25l", 6);
 }
 
-unsigned short max_label_width(char **labels, unsigned short labels_count, unsigned short max_label_length) {
-    unsigned short res = MIN_FIRST_COL_WIDTH;
+unsigned short max_label_width(char **labels, unsigned short labels_count) {
+    unsigned short res = MIN_LABEL_WIDTH;
 
-    for (int i = 0; i < labels_count; i++) {
-        for (int j = 0; j <= max_label_length; j++) {
-            if (j == max_label_length) {
-                return max_label_length;
+    for (unsigned short i = 0; i < labels_count; i++) {
+        for (unsigned short j = 0; j <= MAX_LABEL_LENGTH; j++) {
+            if (j == MAX_LABEL_LENGTH) {
+                return MAX_LABEL_LENGTH;
             }
             if (labels[i][j] == '\0') {
                 if (res < j) res = j;
