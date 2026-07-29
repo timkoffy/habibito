@@ -1,3 +1,5 @@
+#include "utils.h"
+
 volatile short running = 1;
 
 void interrupt_handler(int signum) {
@@ -13,8 +15,6 @@ struct winsize get_screen_size() {
 }
 
 void setup_terminal() {
-    fcntl(0, F_SETFL, fcntl(0, F_GETFL) | O_NONBLOCK);
-
     struct sigaction action;
     memset(&action, 0, sizeof(action));
     action.sa_handler = interrupt_handler;

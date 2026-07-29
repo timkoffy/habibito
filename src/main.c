@@ -8,17 +8,22 @@
 #include <signal.h>
 #include <string.h>
 
-#include "../include/painter.h"
-#include "../include/utils.h"
+#include "painter.h"
+#include "utils.h"
+#include "data_manager.h"
+#include "habit_data.h"
 
 void run() {
     setup_terminal();
 
     struct winsize ws = get_screen_size();
 
-    draw_screen(ws.ws_col, ws.ws_row);
+    struct habit_data data = load_mock_data();
+
+    draw_screen(ws.ws_col, ws.ws_row, &data);
     fflush(stdout);
  
+    /*
     char buf[10];
     while (running) {
         int count = read(0, &buf, 10);
@@ -29,6 +34,7 @@ void run() {
             update_screen(buf);
         }
     }
+    */
 }
 
 int main(int argc, char *argv[]) {
