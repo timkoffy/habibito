@@ -5,6 +5,16 @@
 #include <fcntl.h>
 #include <unistd.h>
 
+#include <signal.h>
+#include <string.h>
+
+volatile sig_atomic_t done = 0;
+
+void interrupt_handler(int signum) {
+    printf("done!\n");
+    done = 1;
+}
+
 struct winsize get_screen_size() {
     struct winsize ws;
     int fd;
@@ -16,13 +26,21 @@ struct winsize get_screen_size() {
 }
 
 void run() {
-    struct winsize ws;
+    struct winsize ws = get_screen_size();
 
-    for(;;) { 
-        ws = get_screen_size();
+    struct sigaction action;
+    memset(&action, 0, sizeof(action));
+    action.sa_handler = interrupt_handler;
+    sigaction(SIGTERM, &action, NULL);
+    sigaction(SIGINT, &action, NULL);
+    
+    int pid = getpid();
 
-        printf("%d, %d\n", ws.ws_row, ws.ws_col);
+    while (!done) {
+        printf("PID: %d\n", pid);
     }
+
+    printf("finished properly!\n");
 }
 
 int main(int argc, char *argv[]) {
