@@ -18,6 +18,9 @@ void draw_screen(unsigned short cols, unsigned short rows, struct habit_data *da
                 j++;
                 continue;
             }
+            if (i == 1) {
+
+            }
             printf(" ");
         }
     }
