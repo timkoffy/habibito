@@ -15,6 +15,8 @@ void run() {
  
     while (running) {
     }
+
+    free_allocated_habit_data(data);
 }
 
 int main(int argc, char *argv[]) {
