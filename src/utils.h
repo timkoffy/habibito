@@ -1,8 +1,12 @@
 #pragma once 
 
+#include <stdlib.h>
+#include <sys/ioctl.h>
 #include <unistd.h>
+#include <signal.h>
+#include <string.h>
 
-volatile short running;
+extern volatile short running;
 
 struct winsize get_screen_size();
 

@@ -23,18 +23,8 @@ void run() {
     draw_screen(ws.ws_col, ws.ws_row, &data);
     fflush(stdout);
  
-    /*
-    char buf[10];
     while (running) {
-        int count = read(0, &buf, 10);
-        if(count > 0) {
-            char ch = count + '0';
-            // write(STDOUT_FILENO, "\e[5;4H", 6);
-            write(STDOUT_FILENO, &ch, 1);
-            update_screen(buf);
-        }
     }
-    */
 }
 
 int main(int argc, char *argv[]) {

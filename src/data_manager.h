@@ -1,6 +1,9 @@
 #pragma once 
 
-#include "../include/habit_data.h"
+#include <stdlib.h>
+#include <string.h>
+
+#include "habit_data.h"
 
 struct habit_data load_data(const char *path);
 

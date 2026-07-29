@@ -1,9 +1,10 @@
 #include "data_manager.h"
 
 struct habit_data load_mock_data() {
+    struct habit_data data;
     data.start_date = 1609459200;     
     data.bytes_per_day = 8;             
-    data.days_count = 3;              
+    data.days_count = 1;              
     data.labels_count = 3;              
     data.max_label_length = 20;       
     data.labels_buffer_count = data.bytes_per_day * 8;
@@ -23,9 +24,9 @@ struct habit_data load_mock_data() {
     data.labels[1] = "music";
     data.labels[2] = "shower";
 
-    data.data[0] = 0x0000;
-    data.data[1] = 0x0000;
-    data.data[2] = 0x0001;
+    unsigned char tmp = (unsigned char)0x0000;
+
+    memcpy((void*)data.data[0], (void*)&tmp, data.bytes_per_day);
 
     return data;
 }
