@@ -27,8 +27,8 @@ void setup_terminal() {
     write(STDOUT_FILENO, "\e[?25l", 6);
 }
 
-void move_cursor(int x, int y) {
-    printf("\e[%d;%dH", y, x);
+void move_cursor(int col, int row) {
+    printf("\e[%d;%dH", row, col);
 }
 
 /* visual utils */
@@ -57,7 +57,7 @@ time_t ceil_timestamp_day(time_t timestamp) {
     return timestamp / SECONDS_IN_DAY * SECONDS_IN_DAY;
 }
 
-char convert_weekday_idx_to_str(unsigned short wd_idx) {
+char get_char_from_weekday(unsigned short wd_idx) {
     const char weekdays[7] = {'s', 'm', 't', 'w', 't', 'f', 's'};
 
     return weekdays[wd_idx];

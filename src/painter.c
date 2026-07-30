@@ -7,6 +7,8 @@ struct paint_info calculate_paint_info(unsigned short rows, unsigned short cols,
     res.total_height = HEADER_HEIGHT + data->labels_count;
     res.max_label_width = max_label_width(data->labels, data->labels_count);
     res.first_column_width = res.max_label_width + 4;
+    res.cells_per_day = 3;
+    res.cells_per_week_border = 2;
 
     return res;
 }
@@ -40,8 +42,40 @@ void draw_screen(struct habit_data *data, struct paint_info *paint_info) {
 }
 
 void draw_calendar(int day_idx_right, struct habit_data *data, struct paint_info *paint_info) {
-    time_t timestamp_day_right = data->start_time + day_idx_right * SECONDS_IN_DAY;
-    time_t timestamp_tmp = timestamp_day_right;
+    time_t timestamp_right = data->start_time + day_idx_right * SECONDS_IN_DAY;
+
+    int capacity = paint_info->cols - paint_info->first_column_width - 2;
+    int n_weeks_ceiled = (capacity + (DAYS_IN_WEEK * paint_info->cells_per_day - 1)) / (DAYS_IN_WEEK * paint_info->cells_per_day);
+    int n_days = (capacity - (n_weeks_ceiled * 2)) / 3;
+
+    // printf("info: capacity = %d, n_days = %d, n_weeks = %d\n", capacity, n_days, n_weeks_ceiled);
+
+    time_t timestamp_tmp = timestamp_right - n_days * SECONDS_IN_DAY;
+
+    for (int i = paint_info->first_column_width + 2; i < paint_info->cols; i += paint_info->cells_per_day) {
+        struct tm *time_info;
+        time_info = localtime(&timestamp_tmp);
+        int weekday = time_info->tm_wday;
+        int monthday = time_info->tm_mday;
+
+        if (weekday == 0) {
+            move_cursor(i, 1);
+            printf("| %02d", monthday);
+            move_cursor(i, 2);
+            printf("| %c", get_char_from_weekday(weekday));
+            i += paint_info->cells_per_week_border;
+        } else {
+            move_cursor(i, 1);
+            printf("%02d", monthday);
+            move_cursor(i, 2);
+            printf("%c", get_char_from_weekday(weekday));
+
+        }
+
+        timestamp_tmp += SECONDS_IN_DAY; 
+    }
+
+    /*
     for (int i = paint_info->cols - 2; i > paint_info->first_column_width; i -= 3) {
         timestamp_tmp -= SECONDS_IN_DAY;
 
@@ -61,4 +95,5 @@ void draw_calendar(int day_idx_right, struct habit_data *data, struct paint_info
         move_cursor(i, 0);
         printf("%02d ", monthday);
     }
+    */
 }

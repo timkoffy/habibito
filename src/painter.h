@@ -12,6 +12,8 @@ struct paint_info {
     unsigned short total_height;
     unsigned short max_label_width;
     unsigned short first_column_width;
+    unsigned short cells_per_day;
+    unsigned short cells_per_week_border;
 };
 
 struct paint_info calculate_paint_info(unsigned short rows, unsigned short cols, struct habit_data *data);
