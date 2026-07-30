@@ -1,5 +1,7 @@
 #include "utils.h"
+
 /* terminal utils */
+
 volatile short running = 1;
 
 void interrupt_handler(int signum) {
@@ -56,3 +58,10 @@ char convert_weekday_idx_to_str(unsigned short wd_idx) {
 
     return weekdays[wd_idx];
 }
+
+int get_weekday_from_timestamp(time_t *timestamp) {
+    struct tm *time_info;
+    time_info = localtime(timestamp);
+    return time_info->tm_wday;
+}
+
