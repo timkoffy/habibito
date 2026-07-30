@@ -14,6 +14,7 @@
 #define DAYS_IN_WEEK 7
  
 extern volatile short running;
+void interrupt_handler(int signum);
 struct winsize get_screen_size();
 void setup_terminal();
 void move_cursor(int x, int y);

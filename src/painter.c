@@ -39,6 +39,7 @@ void draw_screen(struct habit_data *data, struct paint_info *paint_info) {
             printf(" ");
         }
     }
+    fflush(stdout);
 }
 
 void draw_calendar(int day_idx_right, struct habit_data *data, struct paint_info *paint_info) {
@@ -58,42 +59,21 @@ void draw_calendar(int day_idx_right, struct habit_data *data, struct paint_info
         int weekday = time_info->tm_wday;
         int monthday = time_info->tm_mday;
 
-        if (weekday == 0) {
+        if (weekday == 6 && i + 4 < paint_info->cols) {
             move_cursor(i, 1);
-            printf("| %02d", monthday);
+            printf("%02d | ", monthday);
             move_cursor(i, 2);
-            printf("| %c", get_char_from_weekday(weekday));
+            printf("%c  | ", get_char_from_weekday(weekday));
             i += paint_info->cells_per_week_border;
         } else {
             move_cursor(i, 1);
-            printf("%02d", monthday);
+            printf("%02d ", monthday);
             move_cursor(i, 2);
-            printf("%c", get_char_from_weekday(weekday));
+            printf("%c  ", get_char_from_weekday(weekday));
 
         }
 
         timestamp_tmp += SECONDS_IN_DAY; 
     }
-
-    /*
-    for (int i = paint_info->cols - 2; i > paint_info->first_column_width; i -= 3) {
-        timestamp_tmp -= SECONDS_IN_DAY;
-
-        struct tm *time_info;
-        time_info = localtime(&timestamp_tmp);
-        int weekday = time_info->tm_wday;
-        int monthday = time_info->tm_mday;
-
-
-        if (weekday == 0 && i > paint_info->first_column_width + 3) {
-            i -= 2;
-            move_cursor(i, 0);
-            printf("| %02d ", monthday);
-            continue;
-        }
-
-        move_cursor(i, 0);
-        printf("%02d ", monthday);
-    }
-    */
+    fflush(stdout);
 }

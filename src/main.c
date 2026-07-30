@@ -12,11 +12,27 @@ void run() {
     struct habit_data data = load_mock_data(current_time);
     struct paint_info paint_info = calculate_paint_info(ws.ws_row, ws.ws_col, &data);
 
+    char input;
+    int cur_pos = 6;
+
     draw_screen(&data, &paint_info);
-    draw_calendar(3, &data, &paint_info);
-    fflush(stdout);
+    draw_calendar(cur_pos, &data, &paint_info);
  
     while (running) {
+        int count = read(STDIN_FILENO, &input, 1);
+        if (count > 0) {
+            switch (input) {
+                case 'h':
+                    draw_calendar(--cur_pos, &data, &paint_info);
+                    break;
+                case 'l':
+                    draw_calendar(++cur_pos, &data, &paint_info);
+                    break;
+                case 'q':
+                    interrupt_handler(SIGINT);
+                    break;
+            }
+        }
     }
 
     save_data(&data);
