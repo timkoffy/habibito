@@ -13,7 +13,7 @@ void run() {
     struct paint_info paint_info = calculate_paint_info(ws.ws_row, ws.ws_col, &data);
 
     draw_screen(&data, &paint_info);
-    draw_calendar(data.current_time, &data, &paint_info);
+    draw_calendar(3, &data, &paint_info);
     fflush(stdout);
  
     while (running) {

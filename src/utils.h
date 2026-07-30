@@ -1,5 +1,6 @@
 #pragma once 
 
+#include <stdio.h>
 #include <stdlib.h>
 #include <sys/ioctl.h>
 #include <unistd.h>
@@ -14,6 +15,7 @@
 extern volatile short running;
 struct winsize get_screen_size();
 void setup_terminal();
+void move_cursor(int x, int y);
 
 unsigned short max_label_width(char **labels, unsigned short labels_count);
 

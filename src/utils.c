@@ -27,6 +27,10 @@ void setup_terminal() {
     write(STDOUT_FILENO, "\e[?25l", 6);
 }
 
+void move_cursor(int x, int y) {
+    printf("\e[%d;%dH", y, x);
+}
+
 /* visual utils */
 
 unsigned short max_label_width(char **labels, unsigned short labels_count) {
