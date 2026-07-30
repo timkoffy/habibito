@@ -1,11 +1,12 @@
 #include "data_manager.h"
 
-struct habit_data load_mock_data() {
+struct habit_data load_mock_data(time_t current_time) {
     struct habit_data data;
-    data.start_date = 1609459200;     
-    data.bytes_per_day = 8;             
-    data.days_count = 3;              
-    data.labels_count = 3;              
+    data.start_time = ceil_timestamp_day(1609459200);
+    data.current_time = current_time;
+    data.bytes_per_day = 1;   
+    data.days_count = 3;
+    data.labels_count = 3;
     data.labels_buffer_count = data.bytes_per_day * 8;
 
     data.labels = malloc(sizeof(char*) * data.labels_buffer_count);
@@ -43,7 +44,7 @@ void save_data(struct habit_data *data) {
         return;
     }
 
-    write(fd, &data->start_date, sizeof(data->start_date));
+    write(fd, &data->start_time, sizeof(data->start_time));
     write(fd, &data->bytes_per_day, sizeof(data->bytes_per_day));
     write(fd, &data->labels_count, sizeof(data->labels_count));
     

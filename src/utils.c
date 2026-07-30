@@ -1,5 +1,5 @@
 #include "utils.h"
-
+/* terminal utils */
 volatile short running = 1;
 
 void interrupt_handler(int signum) {
@@ -25,6 +25,8 @@ void setup_terminal() {
     write(STDOUT_FILENO, "\e[?25l", 6);
 }
 
+/* visual utils */
+
 unsigned short max_label_width(char **labels, unsigned short labels_count) {
     unsigned short res = MIN_LABEL_WIDTH;
 
@@ -41,4 +43,16 @@ unsigned short max_label_width(char **labels, unsigned short labels_count) {
     }
 
     return res;
+}
+
+/* time visual utils */
+
+time_t ceil_timestamp_day(time_t timestamp) {
+    return timestamp / SECONDS_IN_DAY * SECONDS_IN_DAY;
+}
+
+char convert_weekday_idx_to_str(unsigned short wd_idx) {
+    const char weekdays[7] = {'s', 'm', 't', 'w', 't', 'f', 's'};
+
+    return weekdays[wd_idx];
 }
