@@ -13,7 +13,7 @@ void run() {
     struct paint_info paint_info = calculate_paint_info(ws.ws_row, ws.ws_col, &data);
 
     char input;
-    int cur_pos = 6;
+    int cur_pos = data.days_count - 1;
 
     draw_screen(&data, &paint_info);
     draw_calendar(cur_pos, &data, &paint_info);
@@ -23,10 +23,10 @@ void run() {
         if (count > 0) {
             switch (input) {
                 case 'h':
-                    draw_calendar(--cur_pos, &data, &paint_info);
+                    if (cur_pos > 0) draw_calendar(--cur_pos, &data, &paint_info);
                     break;
                 case 'l':
-                    draw_calendar(++cur_pos, &data, &paint_info);
+                    if (cur_pos + 1 < data.days_count) draw_calendar(++cur_pos, &data, &paint_info);
                     break;
                 case 'q':
                     interrupt_handler(SIGINT);

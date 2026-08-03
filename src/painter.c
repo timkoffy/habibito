@@ -42,37 +42,69 @@ void draw_screen(struct habit_data *data, struct paint_info *paint_info) {
     fflush(stdout);
 }
 
-void draw_calendar(int day_idx_right, struct habit_data *data, struct paint_info *paint_info) {
-    time_t timestamp_right = data->start_time + day_idx_right * SECONDS_IN_DAY;
-
+void draw_calendar(int cur_pos, struct habit_data *data, struct paint_info *paint_info) {
     int capacity = paint_info->cols - paint_info->first_column_width - 2;
     int n_weeks_ceiled = (capacity + (DAYS_IN_WEEK * paint_info->cells_per_day - 1)) / (DAYS_IN_WEEK * paint_info->cells_per_day);
     int n_days = (capacity - (n_weeks_ceiled * 2)) / 3;
 
-    // printf("info: capacity = %d, n_days = %d, n_weeks = %d\n", capacity, n_days, n_weeks_ceiled);
-
+    time_t timestamp_cur = data->start_time + cur_pos * SECONDS_IN_DAY;
+    time_t timestamp_right = timestamp_cur + (n_days / 2) * SECONDS_IN_DAY;
     time_t timestamp_tmp = timestamp_right - n_days * SECONDS_IN_DAY;
 
+    // printf("info: capacity = %d, n_days = %d, n_weeks = %d\n", capacity, n_days, n_weeks_ceiled);
+    
     for (int i = paint_info->first_column_width + 2; i < paint_info->cols; i += paint_info->cells_per_day) {
         struct tm *time_info;
         time_info = localtime(&timestamp_tmp);
         int weekday = time_info->tm_wday;
         int monthday = time_info->tm_mday;
+        
+        int no_data = 0;
+        if (timestamp_tmp < data->start_time || timestamp_tmp > (data->start_time + (data->days_count - 1) * SECONDS_IN_DAY)) {
+            no_data = 1;
+        }    
 
-        if (weekday == 6 && i + 4 < paint_info->cols) {
-            move_cursor(i, 1);
-            printf("%02d | ", monthday);
-            move_cursor(i, 2);
-            printf("%c  | ", get_char_from_weekday(weekday));
-            i += paint_info->cells_per_week_border;
-        } else {
-            move_cursor(i, 1);
-            printf("%02d ", monthday);
-            move_cursor(i, 2);
-            printf("%c  ", get_char_from_weekday(weekday));
-
+        if (no_data) {
+            printf("\e[90m");
         }
 
+        // position visual
+        if (timestamp_tmp == timestamp_cur) {
+            for (int j = 0; j < data->labels_count; j++) {
+                move_cursor(i - 2, j + HEADER_HEIGHT + 1);
+                printf("  .    ");
+            }
+        }
+        
+        // date visual
+        move_cursor(i, 1);
+        printf("%02d ", monthday);
+        move_cursor(i, 2);
+        printf("%c  ", get_char_from_weekday(weekday));
+
+        if (weekday == 6 && i + 4 < paint_info->cols) {
+            move_cursor(i + 3, 1);
+            printf("| ");
+            move_cursor(i + 3, 2);
+            printf("| ");
+            i += paint_info->cells_per_week_border;
+            
+            for (int j = 0; j < data->labels_count; j++) {
+                move_cursor(i, j + HEADER_HEIGHT + 1);
+                // printf(" |");
+            }
+        }
+
+
+        // data visual
+
+
+
+
+        if (no_data) {
+            printf("\e[39m");
+        }    
+        
         timestamp_tmp += SECONDS_IN_DAY; 
     }
     fflush(stdout);
