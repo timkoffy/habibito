@@ -29,6 +29,7 @@ void setup_terminal() {
 
 void move_cursor(int col, int row) {
     printf("\e[%d;%dH", row, col);
+    fflush(stdout);
 }
 
 /* visual utils */

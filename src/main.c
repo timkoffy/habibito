@@ -16,11 +16,36 @@ void run() {
 
     draw_screen(&data, &paint_info);
     draw_calendar(&data, &paint_info);
- 
+    
+    short input_mode = 0;
+    short label_len_tmp = 0;
+    short is_any_letter = 0;
     char input;
     while (running) {
         int count = read(STDIN_FILENO, &input, 1);
         if (count > 0) {
+            if (input_mode) {
+                if (input == ' ' && is_any_letter == 0) continue;
+
+                write(STDOUT_FILENO, &input, 1);
+                
+                is_any_letter = 1;
+                label_len_tmp++;
+                
+                if (label_len_tmp == MAX_LABEL_LENGTH || input == '\n') {
+                    is_any_letter = 0;
+                    label_len_tmp = 0;
+                    input_mode = 0;
+
+                    printf("\e[?25l");
+                    if (input == '\n') printf("\e[1A"); 
+                    printf("\e[2K");
+                    fflush(stdout);
+                }
+
+                continue;
+            } 
+
             switch (input) {
                 case 'h':
                     if (paint_info.cur_pos_day > 0) {
@@ -44,6 +69,13 @@ void run() {
                     if (paint_info.cur_pos_habit < data.labels_count - 1) {
                         paint_info.cur_pos_habit++;
                         draw_calendar(&data, &paint_info);
+                    }
+                    break;
+                case 'a':
+                    if (data.labels_count < 8) {
+                        input_mode = 1;
+                        printf("\e[?25h");
+                        move_cursor(0, HEADER_HEIGHT + data.labels_count + 1); 
                     }
                     break;
                 case 'q':
