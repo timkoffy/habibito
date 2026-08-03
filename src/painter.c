@@ -9,6 +9,8 @@ struct paint_info calculate_paint_info(unsigned short rows, unsigned short cols,
     res.first_column_width = res.max_label_width + 4;
     res.cells_per_day = 3;
     res.cells_per_week_border = 2;
+    res.cur_pos_day = data->days_count - 1;
+    res.cur_pos_habit = 0;
 
     return res;
 }
@@ -42,12 +44,12 @@ void draw_screen(struct habit_data *data, struct paint_info *paint_info) {
     fflush(stdout);
 }
 
-void draw_calendar(int cur_pos, struct habit_data *data, struct paint_info *paint_info) {
+void draw_calendar(struct habit_data *data, struct paint_info *paint_info) {
     int capacity = paint_info->cols - paint_info->first_column_width - 2;
     int n_weeks_ceiled = (capacity + (DAYS_IN_WEEK * paint_info->cells_per_day - 1)) / (DAYS_IN_WEEK * paint_info->cells_per_day);
     int n_days = (capacity - (n_weeks_ceiled * 2)) / 3;
 
-    time_t timestamp_cur = data->start_time + cur_pos * SECONDS_IN_DAY;
+    time_t timestamp_cur = data->start_time + paint_info->cur_pos_day * SECONDS_IN_DAY;
     time_t timestamp_right = timestamp_cur + (n_days / 2) * SECONDS_IN_DAY;
     time_t timestamp_tmp = timestamp_right - n_days * SECONDS_IN_DAY;
 
@@ -72,11 +74,15 @@ void draw_calendar(int cur_pos, struct habit_data *data, struct paint_info *pain
         if (timestamp_tmp == timestamp_cur) {
             for (int j = 0; j < data->labels_count; j++) {
                 move_cursor(i - 2, j + HEADER_HEIGHT + 1);
+                if (paint_info->cur_pos_habit == j) {
+                    printf("  +    ");
+                    continue;
+                }
                 printf("  .    ");
             }
         }
         
-        // date visual
+        // calendar visual
         move_cursor(i, 1);
         printf("%02d ", monthday);
         move_cursor(i, 2);

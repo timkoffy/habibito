@@ -14,8 +14,10 @@ struct paint_info {
     unsigned short first_column_width;
     unsigned short cells_per_day;
     unsigned short cells_per_week_border;
+    unsigned int cur_pos_day;
+    unsigned short cur_pos_habit;
 };
 
 struct paint_info calculate_paint_info(unsigned short rows, unsigned short cols, struct habit_data *data);
 void draw_screen(struct habit_data *data, struct paint_info *paint_info);
-void draw_calendar(int day_idx_right, struct habit_data *data, struct paint_info *paint_info);
+void draw_calendar(struct habit_data *data, struct paint_info *paint_info);

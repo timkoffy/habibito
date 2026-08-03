@@ -37,10 +37,54 @@ struct habit_data load_mock_data(time_t current_time) {
     return data;
 }
 
-void save_data(struct habit_data *data) {
-    int fd = open("../data.bin", O_WRONLY | O_CREAT, 0644);
+struct habit_data load_data(time_t current_time) {
+    struct habit_data data;
+
+    int fd = open(DATA_PATH, O_RDONLY);
     if (fd == -1) {
-        printf("error while opening the file");
+        printf("error while opening the file\n");
+        return data;
+    }
+
+
+    read(fd, &data.start_time, sizeof(data.start_time));
+    read(fd, &data.bytes_per_day, sizeof(data.bytes_per_day));
+    read(fd, &data.labels_count, sizeof(data.labels_count));
+    data.labels_buffer_count = data.bytes_per_day * 8;
+    data.current_time = current_time;
+
+    const int FILE_HEADER_SIZE = sizeof(data.start_time) + sizeof(data.bytes_per_day) + sizeof(data.labels_count);
+    const int FILE_TOTAL_SIZE = lseek(fd, 0, SEEK_END);
+    data.days_count = (FILE_TOTAL_SIZE - FILE_HEADER_SIZE - data.labels_buffer_count * MAX_LABEL_LENGTH) / data.bytes_per_day;
+    lseek(fd, FILE_HEADER_SIZE, SEEK_SET);
+
+//    printf("start_time = $d | bytes_per_day = %d | labels_count = %d", data.start_time, data.bytes_per_day, data.labels_count);
+
+    data.labels = malloc(sizeof(char*) * data.labels_buffer_count);
+    for (int i = 0; i < data.labels_buffer_count; i++) {
+        if (i < data.labels_count) {
+            data.labels[i] = malloc(MAX_LABEL_LENGTH);
+            read(fd, data.labels[i], MAX_LABEL_LENGTH);
+        } else {
+            data.labels[i] = NULL;
+            lseek(fd, MAX_LABEL_LENGTH, SEEK_CUR);
+        }
+    }
+
+    data.data = malloc(data.days_count);
+    for(int i = 0; i < data.days_count; i++) {
+        data.data[i] = malloc(data.bytes_per_day);
+        read(fd, data.data[i], data.bytes_per_day);
+    }
+
+    close(fd);
+    return data;
+}
+
+void save_data(struct habit_data *data) {
+    int fd = open(DATA_PATH, O_WRONLY | O_CREAT | O_TRUNC, 0644);
+    if (fd == -1) {
+        printf("error while opening the file\n");
         return;
     }
 
