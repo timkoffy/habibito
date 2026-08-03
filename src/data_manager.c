@@ -2,10 +2,10 @@
 
 struct habit_data load_mock_data(time_t current_time) {
     struct habit_data data;
-    data.start_time = ceil_timestamp_day(1609459200);
+    data.start_time = ceil_timestamp_day(1785605978);
     data.current_time = ceil_timestamp_day(current_time);
     data.bytes_per_day = 1;   
-    data.days_count = 3;
+    data.days_count = (data.current_time - data.start_time) / SECONDS_IN_DAY + 1;
     data.labels_count = 3;
     data.labels_buffer_count = data.bytes_per_day * 8;
 
