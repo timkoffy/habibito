@@ -168,3 +168,7 @@ void free_allocated_data(struct habit_data *data) {
     }
     free(data->data);
 }
+
+void toggle_habit(unsigned int day, unsigned short habit_idx, struct habit_data *data) {
+    data->data[day][habit_idx] = !data->data[day][habit_idx];       
+}

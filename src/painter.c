@@ -1,21 +1,20 @@
 #include "painter.h"
 
-struct paint_info calculate_paint_info(unsigned short rows, unsigned short cols, struct habit_data *data) {
-    struct paint_info res;
-    res.rows = rows;
-    res.cols = cols;
-    res.total_height = HEADER_HEIGHT + data->labels_count;
-    res.max_label_width = max_label_width(data->labels, data->labels_count);
-    res.first_column_width = res.max_label_width + 4;
-    res.cells_per_day = 3;
-    res.cells_per_week_border = 2;
-    res.cur_pos_day = data->days_count - 1;
-    res.cur_pos_habit = 0;
-
-    return res;
+void calculate_paint_info(struct paint_info *dest, unsigned short rows, unsigned short cols, struct habit_data *data) {
+    dest->rows = rows;
+    dest->cols = cols;
+    dest->total_height = HEADER_HEIGHT + data->labels_count;
+    dest->max_label_width = max_label_width(data->labels, data->labels_count);
+    dest->first_column_width = dest->max_label_width + 4;
+    dest->cells_per_day = 3;
+    dest->cells_per_week_border = 2;
+    dest->cur_pos_day = data->days_count - 1;
+    dest->cur_pos_habit = 0;
 }
 
 void draw_screen(struct habit_data *data, struct paint_info *paint_info) {
+    printf("\e[H");
+    fflush(stdout);
     for (int i = 0; i < paint_info->rows; i++) {
         if (i >= paint_info->total_height && i < paint_info->rows) {
             printf("\n");
@@ -42,7 +41,7 @@ void draw_screen(struct habit_data *data, struct paint_info *paint_info) {
     }
     if (data->labels_count == 0) {
         move_cursor(0, paint_info->total_height + 1);
-        printf("press 'a' to add habit");
+        printf("pdest-> 'a' to add habit");
     }
 
     fflush(stdout);
@@ -58,7 +57,7 @@ void draw_calendar(struct habit_data *data, struct paint_info *paint_info) {
     time_t timestamp_tmp = timestamp_right - n_days * SECONDS_IN_DAY;
 
     // printf("info: capacity = %d, n_days = %d, n_weeks = %d\n", capacity, n_days, n_weeks_ceiled);
-    
+
     for (int i = paint_info->first_column_width + 2; i < paint_info->cols; i += paint_info->cells_per_day) {
         struct tm *time_info;
         time_info = localtime(&timestamp_tmp);

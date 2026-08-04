@@ -15,3 +15,5 @@ struct habit_data load_mock_data(time_t current_time);
 void save_data(struct habit_data *data);
 void free_allocated_data(struct habit_data *data);
 struct habit_data init_data(time_t current_time);
+
+void toggle_habit(unsigned int day, unsigned short habit_idx, struct habit_data *data);

@@ -18,6 +18,6 @@ struct paint_info {
     unsigned short cur_pos_habit;
 };
 
-struct paint_info calculate_paint_info(unsigned short rows, unsigned short cols, struct habit_data *data);
+void calculate_paint_info(struct paint_info *dest, unsigned short rows, unsigned short cols, struct habit_data *data);
 void draw_screen(struct habit_data *data, struct paint_info *paint_info);
 void draw_calendar(struct habit_data *data, struct paint_info *paint_info);
