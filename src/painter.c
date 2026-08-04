@@ -13,7 +13,7 @@ void calculate_paint_info(struct paint_info *dest, unsigned short rows, unsigned
 }
 
 void draw_screen(struct habit_data *data, struct paint_info *paint_info) {
-    printf("\e[H");
+    printf("\e[2J\e[H");
     fflush(stdout);
     for (int i = 0; i < paint_info->rows; i++) {
         if (i >= paint_info->total_height && i < paint_info->rows) {
@@ -41,7 +41,7 @@ void draw_screen(struct habit_data *data, struct paint_info *paint_info) {
     }
     if (data->labels_count == 0) {
         move_cursor(0, paint_info->total_height + 1);
-        printf("pdest-> 'a' to add habit");
+        printf("press 'a' to add habit...");
     }
 
     fflush(stdout);
@@ -116,5 +116,38 @@ void draw_calendar(struct habit_data *data, struct paint_info *paint_info) {
         
         timestamp_tmp += SECONDS_IN_DAY; 
     }
+    fflush(stdout);
+}
+
+void draw_info_screen(struct habit_data *data, struct paint_info *paint_info) {
+    printf("\e[2J\e[H");
+    printf("some statistics\n\n");
+    printf("===== HABIT DATA STRUCT INFO =====\n");
+    
+    char start_str_time[20];
+    char cur_str_time[20];
+
+    strftime(start_str_time, 20, "%D", localtime(&data->start_time));
+    strftime(cur_str_time, 20, "%D", localtime(&data->current_time));
+
+    printf("start_time:            %s\n", start_str_time);
+    printf("current_time:          %s\n", cur_str_time);
+    printf("bytes_per_day:         %d\n", data->bytes_per_day);
+    printf("days_count:            %d\n", data->days_count);
+    printf("labels_count:          %d\n", data->labels_count);
+    printf("labels_buffer_count:   %d\n", data->labels_buffer_count);
+
+    printf("\n===== PAINT INFO STRUCT INFO =====\n");
+    
+    printf("rows:                  %d\n", paint_info->rows);
+    printf("cols:                  %d\n", paint_info->cols);
+    printf("total_height           %d\n", paint_info->total_height);
+    printf("max_label_width:       %d\n", paint_info->max_label_width);
+    printf("first_column_width:    %d\n", paint_info->first_column_width);
+    printf("cur_pos_day:           %d\n", paint_info->cur_pos_day);
+    printf("cur_pos_habit:         %d\n", paint_info->cur_pos_habit);
+
+    // printf("\nLAST CURSOR POSITION: row = %d, col = %d\n");
+
     fflush(stdout);
 }

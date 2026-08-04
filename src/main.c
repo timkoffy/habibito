@@ -23,6 +23,9 @@ void run() {
     short is_any_letter = 0;
     char input;
     char input_buf[MAX_LABEL_LENGTH]; 
+
+    short is_info_screen = 0;
+
     while (running) {
         int count = read(STDIN_FILENO, &input, 1);
         if (count > 0) {
@@ -50,6 +53,8 @@ void run() {
                     calculate_paint_info(&paint_info, ws.ws_row, ws.ws_col, &data);
                     draw_screen(&data, &paint_info);
                     draw_calendar(&data, &paint_info);
+
+                    continue;
                 }
                 
                 write(STDOUT_FILENO, &input, 1);
