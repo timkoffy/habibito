@@ -54,8 +54,13 @@ void draw_calendar(struct habit_data *data, struct paint_info *paint_info) {
     time_t timestamp_cur = data->start_time + paint_info->cur_pos_day * SECONDS_IN_DAY;
     time_t timestamp_right = timestamp_cur + (n_days / 2) * SECONDS_IN_DAY;
     time_t timestamp_tmp = timestamp_right - n_days * SECONDS_IN_DAY;
+    int cur_day_tmp = paint_info->cur_pos_day + n_days / 2 - n_days;
 
-    // printf("info: capacity = %d, n_days = %d, n_weeks = %d\n", capacity, n_days, n_weeks_ceiled);
+    // printf("info: capacity = %d, n_days = %d, n_weeks = %d, cur_day_tmp = %d\n", capacity, n_days, n_weeks_ceiled, cur_day_tmp);
+    for (int i = 0; i < data->labels_count; i++) {
+        printf("\e[%d;%dH\e[0K", i + HEADER_HEIGHT + 1, paint_info->first_column_width + 1);
+    }
+    fflush(stdout);
 
     for (int i = paint_info->first_column_width + 2; i < paint_info->cols; i += paint_info->cells_per_day) {
         struct tm *time_info;
@@ -84,6 +89,18 @@ void draw_calendar(struct habit_data *data, struct paint_info *paint_info) {
             }
         }
         
+        // data visual
+        if (!no_data && cur_day_tmp >= 0 && cur_day_tmp < data->days_count) {
+            for (int label_idx = 0; label_idx < data->labels_count; label_idx++) {
+                move_cursor(i, label_idx + HEADER_HEIGHT + 1);
+                if (is_bit_true(&data->data[cur_day_tmp][label_idx / 8], label_idx % 8)) {
+                    printf("* ");
+                } else {
+                    printf("- ");
+                }
+            }
+        }
+
         // calendar visual
         move_cursor(i, 1);
         printf("%02d ", monthday);
@@ -99,21 +116,16 @@ void draw_calendar(struct habit_data *data, struct paint_info *paint_info) {
             
             for (int j = 0; j < data->labels_count; j++) {
                 move_cursor(i, j + HEADER_HEIGHT + 1);
-                // printf(" |");
+                printf(" |");
             }
         }
-
-
-        // data visual
-
-
-
 
         if (no_data) {
             printf("\e[39m");
         }    
         
         timestamp_tmp += SECONDS_IN_DAY; 
+        cur_day_tmp++;
     }
     fflush(stdout);
 }

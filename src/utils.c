@@ -83,3 +83,8 @@ void change_bit(unsigned char *byte, int bit_idx) {
     unsigned char mask = 0x1 << bit_idx;
     *byte ^= mask;
 }
+
+int is_bit_true(unsigned char *byte, int bit_idx) {
+    unsigned char mask = 0x1 << bit_idx;
+    return *byte & mask;
+}

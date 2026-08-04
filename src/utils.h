@@ -29,3 +29,4 @@ int get_weekday_from_timestamp(time_t *timestamp);
 void print_error(const char *err);
 
 void change_bit(unsigned char *byte, int bit_idx);
+int is_bit_true(unsigned char *byte, int bit_idx);
