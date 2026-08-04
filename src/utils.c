@@ -73,5 +73,6 @@ int get_weekday_from_timestamp(time_t *timestamp) {
 /* statistics utils */
 
 void print_error(const char *err) {
-    dprintf(STDOUT_FILENO, "\e[999;1H\e[31mERROR: %s\e[39m", err);
+    dprintf(STDOUT_FILENO, "\e[999;1H\e[2K\e[31mERROR: %s\e[39m", err);
+    fflush(stdout);
 }

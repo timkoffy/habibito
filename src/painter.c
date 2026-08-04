@@ -13,11 +13,10 @@ void calculate_paint_info(struct paint_info *dest, unsigned short rows, unsigned
 }
 
 void draw_screen(struct habit_data *data, struct paint_info *paint_info) {
-    printf("\e[2J\e[H");
+    printf("\e[%d;999H\e[1J\e[H", paint_info->rows - 1);
     fflush(stdout);
     for (int i = 0; i < paint_info->rows; i++) {
         if (i >= paint_info->total_height && i < paint_info->rows) {
-            printf("\n");
             continue;
         }
 

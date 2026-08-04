@@ -17,7 +17,7 @@ void run() {
     calculate_paint_info(&paint_info, ws.ws_row, ws.ws_col, &data);
     draw_screen(&data, &paint_info);
     draw_calendar(&data, &paint_info);
-   
+
     short input_mode = 0;
     short input_len = 0;
     short is_any_letter = 0;
@@ -43,6 +43,8 @@ void run() {
                     if (input == '\n') printf("\e[1A"); 
                     printf("\e[2K");
                     fflush(stdout);
+
+                    print_error("lol");
     
                     // allocate memory for new label
                     data.labels[data.labels_count] = calloc(MAX_LABEL_LENGTH, 1);
