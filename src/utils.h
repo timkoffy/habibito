@@ -27,3 +27,5 @@ char get_char_from_weekday(unsigned short wd_idx);
 int get_weekday_from_timestamp(time_t *timestamp);
 
 void print_error(const char *err);
+
+void change_bit(unsigned char *byte, int bit_idx);

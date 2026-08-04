@@ -1,42 +1,5 @@
 #include "data_manager.h"
 
-struct habit_data load_mock_data(time_t current_time) {
-    struct habit_data data;
-    data.start_time = ceil_timestamp_day(1785605978);
-    data.current_time = ceil_timestamp_day(current_time);
-    data.bytes_per_day = 1;   
-    data.days_count = (data.current_time - data.start_time) / SECONDS_IN_DAY + 1;
-    data.labels_count = 3;
-    data.labels_buffer_count = data.bytes_per_day * 8;
-
-    data.labels = malloc(sizeof(char*) * data.labels_buffer_count);
-    for (int i = 0; i < data.labels_buffer_count; i++) {
-        if (i < data.labels_count) data.labels[i] = calloc(MAX_LABEL_LENGTH, sizeof(char));
-        else data.labels[i] = NULL;
-    }
-
-    data.data = malloc(sizeof(unsigned char*) * data.days_count);
-    for(int i = 0; i < data.days_count; i++) {
-        data.data[i] = malloc(sizeof(unsigned char) * data.bytes_per_day);
-    }
-
-    char str1[] = "limux";
-    char str2[] = "mus";
-    char str3[] = "stretching-awareness";
-
-    memcpy(data.labels[0], str1, sizeof(str1)); 
-    memcpy(data.labels[1], str2, sizeof(str2)); 
-    memcpy(data.labels[2], str3, sizeof(str3)); 
-
-    unsigned char tmp = (unsigned char)0x0000;
-
-    for (int i = 0; i < data.days_count; i++) {
-        memcpy((void*)data.data[i], (void*)&tmp, data.bytes_per_day);
-    }
-
-    return data;
-}
-
 struct habit_data load_data(time_t current_time) {
     int fd = open(DATA_PATH, O_RDONLY);
     if (fd == -1) {
@@ -57,11 +20,9 @@ struct habit_data load_data(time_t current_time) {
     lseek(fd, FILE_HEADER_SIZE, SEEK_SET);
 
     if (days_count_prev < data.days_count) {
-        printf("error: previous days count larger than current days count\n");
+        print_error("previous days count larger than current days count");
         return data;
     }
-
-    // printf("\nstart_time = %d | current_time = %d | bytes_per_day = %d | labels_count = %d", data.start_time, data.current_time, data.bytes_per_day, data.labels_count);
 
     data.labels = malloc(sizeof(char*) * data.labels_buffer_count);
     for (int i = 0; i < data.labels_buffer_count; i++) {
@@ -80,7 +41,7 @@ struct habit_data load_data(time_t current_time) {
             data.data[i] = malloc(data.bytes_per_day);
             read(fd, data.data[i], data.bytes_per_day);
         } else {
-            data.data[i] = calloc(1, data.bytes_per_day);
+            data.data[i] = calloc(data.bytes_per_day, 1);
         }
     }
 
@@ -105,39 +66,16 @@ struct habit_data init_data(time_t current_time) {
 
     data.data = malloc(sizeof(char*) * data.days_count);
     for(int i = 0; i < data.days_count; i++) {
-        data.data[i] = calloc(1, data.bytes_per_day);
+        data.data[i] = calloc(data.bytes_per_day, 1);
     }
     
-    /*
-    char start_str_time[20];
-    char cur_str_time[20];
-
-    strftime(start_str_time, 20, "%D", localtime(&data.start_time));
-    strftime(cur_str_time, 20, "%D", localtime(&data.current_time));
-
-    printf("[init_data] days_count: %d | start_time: %s | current_time: %s\n", data.days_count, start_str_time, cur_str_time);
-    */
-
     return data;
 }
-
-/*
-[init_data] days_count: 7 | start_time: 07/28/26 | current_time: 08/04/26
-
-28 
-29
-30 
-31 
-1 
-2 
-3 
-4 
-*/
 
 void save_data(struct habit_data *data) {
     int fd = open(DATA_PATH, O_WRONLY | O_CREAT | O_TRUNC, 0644);
     if (fd == -1) {
-        printf("error while opening the file\n");
+        print_error("couldn't open the file");
         return;
     }
 
@@ -170,5 +108,7 @@ void free_allocated_data(struct habit_data *data) {
 }
 
 void toggle_habit(unsigned int day, unsigned short habit_idx, struct habit_data *data) {
-    data->data[day][habit_idx] = !data->data[day][habit_idx];       
+    int byte_idx = habit_idx / 8;
+    int bit_idx = habit_idx % 8;
+    change_bit(&data->data[day][byte_idx], bit_idx);
 }

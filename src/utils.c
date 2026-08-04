@@ -76,3 +76,10 @@ void print_error(const char *err) {
     dprintf(STDOUT_FILENO, "\e[999;1H\e[2K\e[31mERROR: %s\e[39m", err);
     fflush(stdout);
 }
+
+/* data utils */
+
+void change_bit(unsigned char *byte, int bit_idx) {
+    unsigned char mask = 0x1 << bit_idx;
+    *byte ^= mask;
+}
