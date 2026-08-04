@@ -31,7 +31,6 @@ void draw_screen(struct habit_data *data, struct paint_info *paint_info) {
                 int label_idx = i - HEADER_HEIGHT;
                 printf("%d", label_idx);
                 j += printf(" %s", data->labels[label_idx]);
-
                 continue;
             }
             if (j == paint_info->max_label_width + 3) {
@@ -41,6 +40,11 @@ void draw_screen(struct habit_data *data, struct paint_info *paint_info) {
             printf(" ");
         }
     }
+    if (data->labels_count == 0) {
+        move_cursor(0, paint_info->total_height + 1);
+        printf("press 'a' to add habit");
+    }
+                
     fflush(stdout);
 }
 

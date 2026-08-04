@@ -12,7 +12,7 @@ void run() {
     struct habit_data data = load_data(current_time);
     struct paint_info paint_info = calculate_paint_info(ws.ws_row, ws.ws_col, &data);
 
-//    printf("%d, %d, %d, %d\n", data.start_time, data.bytes_per_day, data.labels_count, data.days_count);
+//    printf("%s, %d, %d, %d\n", asctime(localtime(&data.current_time)), data.bytes_per_day, data.labels_count, data.days_count);
 
     draw_screen(&data, &paint_info);
     draw_calendar(&data, &paint_info);
@@ -76,6 +76,9 @@ void run() {
                         input_mode = 1;
                         printf("\e[?25h");
                         move_cursor(0, HEADER_HEIGHT + data.labels_count + 1); 
+                        printf("\e[2K");
+                        printf("%d ", data.labels_count);
+                        fflush(stdout);
                     }
                     break;
                 case 'q':
@@ -85,7 +88,7 @@ void run() {
         }
     }
 
-//    save_data(&data);
+    save_data(&data);
     free_allocated_habit_data(&data);
 }
 

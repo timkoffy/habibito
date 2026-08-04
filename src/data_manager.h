@@ -14,3 +14,4 @@ struct habit_data load_data(time_t current_time);
 struct habit_data load_mock_data(time_t current_time);
 void save_data(struct habit_data *data);
 void free_allocated_habit_data(struct habit_data *data);
+struct habit_data init_data(time_t current_time);
