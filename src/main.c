@@ -44,8 +44,6 @@ void run() {
                     printf("\e[2K");
                     fflush(stdout);
 
-                    print_error("lol");
-    
                     // allocate memory for new label
                     data.labels[data.labels_count] = calloc(MAX_LABEL_LENGTH, 1);
                     memcpy(data.labels[data.labels_count], input_buf, MAX_LABEL_LENGTH);
@@ -102,7 +100,7 @@ void run() {
                         fflush(stdout);
                     }
                     break;
-                case '\n':
+                case '\n': case 'i':
                     toggle_habit(paint_info.cur_pos_day, paint_info.cur_pos_habit, &data);
                     draw_calendar(&data, &paint_info);
                     break;

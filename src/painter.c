@@ -22,6 +22,10 @@ void draw_screen(struct habit_data *data, struct paint_info *paint_info) {
 
         for (int j = 0; j < paint_info->cols; j++) {
             if (i == HEADER_HEIGHT - 1) { 
+                if (j == paint_info->first_column_width - 1) {
+                    printf("+\n");
+                    break;
+                }
                 printf("-");
                 continue;
             }
@@ -57,12 +61,14 @@ void draw_calendar(struct habit_data *data, struct paint_info *paint_info) {
     int cur_day_tmp = paint_info->cur_pos_day + n_days / 2 - n_days;
 
     // printf("info: capacity = %d, n_days = %d, n_weeks = %d, cur_day_tmp = %d\n", capacity, n_days, n_weeks_ceiled, cur_day_tmp);
+  
+    // clear prev state of calendar
     for (int i = 0; i < data->labels_count; i++) {
         printf("\e[%d;%dH\e[0K", i + HEADER_HEIGHT + 1, paint_info->first_column_width + 1);
     }
     fflush(stdout);
 
-    for (int i = paint_info->first_column_width + 2; i < paint_info->cols; i += paint_info->cells_per_day) {
+    for (int i = paint_info->first_column_width + 2; i < paint_info->cols - 1; i += paint_info->cells_per_day) {
         struct tm *time_info;
         time_info = localtime(&timestamp_tmp);
         int weekday = time_info->tm_wday;
@@ -77,27 +83,23 @@ void draw_calendar(struct habit_data *data, struct paint_info *paint_info) {
             printf("\e[90m");
         }
 
-        // position visual
-        if (timestamp_tmp == timestamp_cur) {
-            for (int j = 0; j < data->labels_count; j++) {
-                move_cursor(i - 2, j + HEADER_HEIGHT + 1);
-                if (paint_info->cur_pos_habit == j) {
-                    printf("  +    ");
-                    continue;
-                }
-                printf("  .    ");
-            }
-        }
-        
         // data visual
         if (!no_data && cur_day_tmp >= 0 && cur_day_tmp < data->days_count) {
             for (int label_idx = 0; label_idx < data->labels_count; label_idx++) {
-                move_cursor(i, label_idx + HEADER_HEIGHT + 1);
+                move_cursor(i - 1, label_idx + HEADER_HEIGHT + 1);
+                if (paint_info->cur_pos_habit == label_idx && paint_info->cur_pos_day == cur_day_tmp) {
+                    printf("\e[90m[\e[39m");
+                } else printf(" ");
+                
                 if (is_bit_true(&data->data[cur_day_tmp][label_idx / 8], label_idx % 8)) {
-                    printf("* ");
+                    printf("*");
                 } else {
-                    printf("- ");
+                    printf("\e[90m-\e[39m");
                 }
+
+                if (paint_info->cur_pos_habit == label_idx && paint_info->cur_pos_day == cur_day_tmp) {
+                    printf("\e[90m] \e[39m");
+                } else printf("  ");
             }
         }
 
@@ -106,12 +108,16 @@ void draw_calendar(struct habit_data *data, struct paint_info *paint_info) {
         printf("%02d ", monthday);
         move_cursor(i, 2);
         printf("%c  ", get_char_from_weekday(weekday));
+        move_cursor(i, 3); 
+        printf("---");
 
         if (weekday == 6 && i + 4 < paint_info->cols) {
-            move_cursor(i + 3, 1);
-            printf("| ");
-            move_cursor(i + 3, 2);
-            printf("| ");
+            move_cursor(i + paint_info->cells_per_week_border, 1);
+            printf(" | ");
+            move_cursor(i + paint_info->cells_per_week_border, 2);
+            printf(" | ");
+            move_cursor(i + paint_info->cells_per_week_border, 3);
+            printf("-+-");
             i += paint_info->cells_per_week_border;
             
             for (int j = 0; j < data->labels_count; j++) {
