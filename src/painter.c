@@ -17,7 +17,7 @@ struct paint_info calculate_paint_info(unsigned short rows, unsigned short cols,
 
 void draw_screen(struct habit_data *data, struct paint_info *paint_info) {
     for (int i = 0; i < paint_info->rows; i++) {
-        if (i >= paint_info->total_height) {
+        if (i >= paint_info->total_height && i < paint_info->rows) {
             printf("\n");
             continue;
         }
@@ -44,7 +44,7 @@ void draw_screen(struct habit_data *data, struct paint_info *paint_info) {
         move_cursor(0, paint_info->total_height + 1);
         printf("press 'a' to add habit");
     }
-                
+
     fflush(stdout);
 }
 

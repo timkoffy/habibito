@@ -25,3 +25,5 @@ unsigned short max_label_width(char **labels, unsigned short labels_count);
 time_t ceil_timestamp_day(time_t timestamp);
 char get_char_from_weekday(unsigned short wd_idx);
 int get_weekday_from_timestamp(time_t *timestamp);
+
+void print_error(const char *err);

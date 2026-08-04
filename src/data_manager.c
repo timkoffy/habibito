@@ -49,11 +49,17 @@ struct habit_data load_data(time_t current_time) {
     read(fd, &data.labels_count, sizeof(data.labels_count));
     data.labels_buffer_count = data.bytes_per_day * 8;
     data.current_time = ceil_timestamp_day(current_time);
+    data.days_count = (data.current_time - data.start_time) / SECONDS_IN_DAY + 1;
 
     const int FILE_HEADER_SIZE = sizeof(data.start_time) + sizeof(data.bytes_per_day) + sizeof(data.labels_count);
     const int FILE_TOTAL_SIZE = lseek(fd, 0, SEEK_END);
-    data.days_count = (FILE_TOTAL_SIZE - FILE_HEADER_SIZE - data.labels_buffer_count * MAX_LABEL_LENGTH) / data.bytes_per_day;
+    const int days_count_prev = (FILE_TOTAL_SIZE - FILE_HEADER_SIZE - data.labels_buffer_count * MAX_LABEL_LENGTH) / data.bytes_per_day;
     lseek(fd, FILE_HEADER_SIZE, SEEK_SET);
+
+    if (days_count_prev < data.days_count) {
+        printf("error: previous days count larger than current days count\n");
+        return data;
+    }
 
     // printf("\nstart_time = %d | current_time = %d | bytes_per_day = %d | labels_count = %d", data.start_time, data.current_time, data.bytes_per_day, data.labels_count);
 
@@ -70,8 +76,12 @@ struct habit_data load_data(time_t current_time) {
 
     data.data = malloc(sizeof(char*) * data.days_count);
     for(int i = 0; i < data.days_count; i++) {
-        data.data[i] = malloc(data.bytes_per_day);
-        read(fd, data.data[i], data.bytes_per_day);
+        if (i < days_count_prev) {
+            data.data[i] = malloc(data.bytes_per_day);
+            read(fd, data.data[i], data.bytes_per_day);
+        } else {
+            data.data[i] = calloc(1, data.bytes_per_day);
+        }
     }
 
     close(fd);
@@ -147,7 +157,7 @@ void save_data(struct habit_data *data) {
     close(fd);
 }
 
-void free_allocated_habit_data(struct habit_data *data) {
+void free_allocated_data(struct habit_data *data) {
     for (int i = 0; i < data->labels_buffer_count; i++) {
         if (data->labels[i] != NULL) free(data->labels[i]);
     }

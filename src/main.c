@@ -16,7 +16,9 @@ void run() {
 
     draw_screen(&data, &paint_info);
     draw_calendar(&data, &paint_info);
-    
+   
+    print_error("bruh");
+
     short input_mode = 0;
     short label_len_tmp = 0;
     short is_any_letter = 0;
@@ -89,7 +91,7 @@ void run() {
     }
 
     save_data(&data);
-    free_allocated_habit_data(&data);
+    free_allocated_data(&data);
 }
 
 int main(int argc, char *argv[]) {
