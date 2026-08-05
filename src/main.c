@@ -34,7 +34,7 @@ void run() {
 
                 is_any_letter = 1;
                 
-                if (input_len + 1 == MAX_LABEL_LENGTH || input == '\n') {
+                if (input_len == MAX_LABEL_LENGTH || input == '\n') {
                     is_any_letter = 0;
                     input_len = 0;
                     input_mode = 0;
