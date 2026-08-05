@@ -46,6 +46,10 @@ struct habit_data load_data(time_t current_time) {
     }
 
     close(fd);
+
+    data.art_buffer = malloc(MAX_ART_WIDTH * 2);
+    if (!parse_config_art(data.art_buffer)) {
+    }
     return data;
 }
 
@@ -111,4 +115,68 @@ void toggle_habit(unsigned int day, unsigned short habit_idx, struct habit_data 
     int byte_idx = habit_idx / 8;
     int bit_idx = habit_idx % 8;
     change_bit(&data->data[day][byte_idx], bit_idx);
+}
+
+int parse_config_art(char *dest) {
+    /* the stupiest thing I've ever writen */
+
+    int fd = open(CONFIG_PATH, O_RDONLY);
+    if (fd == -1) {
+        print_error("couldn't open the config file");
+        return 0;
+    }
+
+    lseek(fd, 0, SEEK_END);
+
+    char cur_char;
+    do {
+        read(fd, &cur_char, 1);
+        lseek(fd, -2, SEEK_CUR);
+    } while(cur_char == '\n');
+
+    int count_newline = 0;
+    while(count_newline < 2) {
+        read(fd, &cur_char, 1);
+        if (cur_char == '\n') {
+            count_newline++;
+        }
+        lseek(fd, -2, SEEK_CUR);
+    }
+    lseek(fd, 2, SEEK_CUR);
+    count_newline = 0;
+    
+    int write_idx = 0;
+    while(read(fd, &cur_char, 1)) {
+        if (count_newline == 0 && write_idx >= MAX_ART_WIDTH) {
+            while(cur_char != '\n') {
+                read(fd, &cur_char, 1);
+            }
+        }
+        if (count_newline == 1 && write_idx >= MAX_ART_WIDTH * 2) {
+            break;
+        }
+        if (cur_char == '\n') {
+            count_newline++;
+            if (count_newline == 1) {
+                while(write_idx < MAX_ART_WIDTH) {
+                    dest[write_idx++] = ' ';
+                }
+                continue;
+            }
+            if (count_newline == 2) {
+                while(write_idx < MAX_ART_WIDTH * 2) {
+                    dest[write_idx++] = ' ';
+                }
+                break;
+            }
+        }
+        dest[write_idx++] = cur_char;
+    }
+
+    if (write_idx != MAX_ART_WIDTH * 2) {
+        print_error("while parsing art from config file to buffer");
+        return 0;
+    }
+    
+    return 1;
 }

@@ -22,3 +22,4 @@ void calculate_paint_info(struct paint_info *dest, unsigned short rows, unsigned
 void draw_screen(struct habit_data *data, struct paint_info *paint_info);
 void draw_calendar(struct habit_data *data, struct paint_info *paint_info);
 void draw_info_screen(struct habit_data *data, struct paint_info *paint_info);
+void draw_art(struct habit_data *data, struct paint_info *paint_info);

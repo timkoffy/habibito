@@ -12,7 +12,6 @@
 
 #define SECONDS_IN_DAY 86400
 #define DAYS_IN_WEEK 7
-#define DATA_PATH "../data.bin" 
 
 extern volatile short running;
 void interrupt_handler(int signum);

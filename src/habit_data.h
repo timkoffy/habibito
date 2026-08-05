@@ -9,4 +9,5 @@ struct habit_data {
     unsigned short labels_buffer_count;
     char **labels;
     unsigned char **data;
+    char *art_buffer;
 };

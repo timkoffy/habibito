@@ -10,6 +10,9 @@
 #include "config.h"
 #include "utils.h"
 
+#define DATA_PATH "../data.bin" 
+#define CONFIG_PATH "../config"
+
 struct habit_data load_data(time_t current_time);
 struct habit_data load_mock_data(time_t current_time);
 void save_data(struct habit_data *data);
@@ -17,3 +20,5 @@ void free_allocated_data(struct habit_data *data);
 struct habit_data init_data(time_t current_time);
 
 void toggle_habit(unsigned int day, unsigned short habit_idx, struct habit_data *data);
+
+int parse_config_art(char *dest);

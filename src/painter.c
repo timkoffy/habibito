@@ -47,6 +47,7 @@ void draw_screen(struct habit_data *data, struct paint_info *paint_info) {
         printf("press 'a' to add habit...");
     }
 
+    draw_art(data, paint_info);
     fflush(stdout);
 }
 
@@ -163,8 +164,20 @@ void draw_info_screen(struct habit_data *data, struct paint_info *paint_info) {
     printf("first_column_width:    %d\n", paint_info->first_column_width);
     printf("cur_pos_day:           %d\n", paint_info->cur_pos_day);
     printf("cur_pos_habit:         %d\n", paint_info->cur_pos_habit);
+    
+    printf("\n=====  ART FROM CONFIG FILE  =====\n");
+    write(STDOUT_FILENO, data->art_buffer, MAX_ART_WIDTH);
+    printf("||||||| just to show ||||||||||||\n");
+    write(STDOUT_FILENO, data->art_buffer + MAX_ART_WIDTH, MAX_ART_WIDTH);
+    printf("||||||||||| border of art |||||||\n");
 
-    // printf("\nLAST CURSOR POSITION: row = %d, col = %d\n");
 
     fflush(stdout);
+}
+
+void draw_art(struct habit_data *data, struct paint_info *paint_info) {
+    move_cursor(1, 1);
+    write(STDOUT_FILENO, data->art_buffer, paint_info->first_column_width - 1);
+    move_cursor(1, 2);
+    write(STDOUT_FILENO, data->art_buffer + MAX_ART_WIDTH, paint_info->first_column_width - 1);
 }
