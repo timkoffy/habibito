@@ -19,7 +19,7 @@ struct habit_data load_data(time_t current_time) {
     const int days_count_prev = (FILE_TOTAL_SIZE - FILE_HEADER_SIZE - data.labels_buffer_count * MAX_LABEL_LENGTH) / data.bytes_per_day;
     lseek(fd, FILE_HEADER_SIZE, SEEK_SET);
 
-    if (days_count_prev < data.days_count) {
+    if (days_count_prev > data.days_count) {
         print_error("previous days count larger than current days count");
         return data;
     }
