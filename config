@@ -5,6 +5,6 @@ it will help you:
     - it can expand to 35 characters
     - max height is 2 characters
 
-put your art in 2 lines below there:
-/\____/\,   .".1234567890123456789012345678901234567890 
+put your art in 2 lines below there (it will be cropped automatically if there are more than 35 characters in one line):
+/\____/\,   .".
  0    0 \   //
