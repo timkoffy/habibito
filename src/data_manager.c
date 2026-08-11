@@ -1,7 +1,37 @@
 #include "data_manager.h"
 
-struct habit_data load_data(time_t current_time) {
-    int fd = open(DATA_PATH, O_RDONLY);
+char *get_data_path() {
+    const char *home = getenv("HOME");
+
+    char *dir_path;
+    asprintf(&dir_path, "%s/.habibito", home);
+
+    mkdir(dir_path, 0755);
+
+    char *full_path;
+    asprintf(&full_path, "%s/data.bin", dir_path);
+    free(dir_path);
+
+    return full_path;
+}
+
+char *get_config_path() {
+    const char *home = getenv("HOME");
+
+    char *dir_path;
+    asprintf(&dir_path, "%s/.config/habibito", home);
+
+    mkdir(dir_path, 0755);
+
+    char *full_path;
+    asprintf(&full_path, "%s/config", dir_path);
+    free(dir_path);
+
+    return full_path;
+}
+
+struct habit_data load_data(char *data_path, char *config_path, time_t current_time) {
+    int fd = open(data_path, O_RDONLY);
     if (fd == -1) {
         return init_data(current_time);
     }
@@ -26,9 +56,7 @@ struct habit_data load_data(time_t current_time) {
 
     data.labels = malloc(sizeof(char*) * data.labels_buffer_count);
     for (int label_idx = 0; label_idx < data.labels_buffer_count; label_idx++) {
-        if (label_idx < data.labels_count) {
-            data.labels[label_idx] = malloc(MAX_LABEL_LENGTH);
-            read(fd, data.labels[label_idx], MAX_LABEL_LENGTH);
+        if (label_idx < data.labels_count) { data.labels[label_idx] = malloc(MAX_LABEL_LENGTH); read(fd, data.labels[label_idx], MAX_LABEL_LENGTH);
         } else {
             data.labels[label_idx] = NULL;
             lseek(fd, MAX_LABEL_LENGTH, SEEK_CUR);
@@ -48,7 +76,7 @@ struct habit_data load_data(time_t current_time) {
     close(fd);
 
     data.art_buffer = malloc(MAX_ART_WIDTH * 2);
-    if (!parse_config_art(data.art_buffer)) {
+    if (!parse_config_art(config_path, data.art_buffer)) {
     }
     return data;
 }
@@ -76,8 +104,8 @@ struct habit_data init_data(time_t current_time) {
     return data;
 }
 
-void save_data(struct habit_data *data) {
-    int fd = open(DATA_PATH, O_WRONLY | O_CREAT | O_TRUNC, 0644);
+void save_data(char *data_path, struct habit_data *data) {
+    int fd = open(data_path, O_WRONLY | O_CREAT | O_TRUNC, 0644);
     if (fd == -1) {
         print_error("couldn't open the file");
         return;
@@ -117,10 +145,10 @@ void toggle_habit_value(int day_idx, int habit_idx, struct habit_data *data) {
     change_bit(&data->data[day_idx][byte_idx], bit_idx);
 }
 
-int parse_config_art(char *dest) {
+int parse_config_art(char *config_path, char *dest) {
     /* the stupiest thing I've ever writen */
 
-    int fd = open(CONFIG_PATH, O_RDONLY);
+    int fd = open(config_path, O_RDONLY);
     if (fd == -1) {
         print_error("couldn't open the config file");
         return 0;

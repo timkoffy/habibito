@@ -11,8 +11,11 @@
 void run() {
     setup_terminal();
 
+    char *data_path = get_data_path();
+    char *config_path = get_config_path();
+
     time_t current_time = time(NULL);
-    struct habit_data data = load_data(current_time);
+    struct habit_data data = load_data(data_path, config_path, current_time);
 
     struct winsize ws = get_screen_size();
     struct paint_info paint_info;
@@ -38,8 +41,7 @@ void run() {
             } 
 
             switch (input) {
-                case 'k': handle_move_up(&data, &paint_info); break;
-                case 'j': handle_move_down(&data, &paint_info); break;
+                case 'k': handle_move_up(&data, &paint_info); break; case 'j': handle_move_down(&data, &paint_info); break;
                 case 'l': handle_move_right(&data, &paint_info); break;
                 case 'h': handle_move_left(&data, &paint_info); break;
                 case 'a': handle_add_label(&input_mode, &data, &paint_info); break;
@@ -50,8 +52,10 @@ void run() {
         }
     }
 
-    save_data(&data);
+    save_data(data_path, &data);
     free_allocated_data(&data);
+    free(data_path);
+    free(config_path);
 }
 
 int main(int argc, char *argv[]) {
