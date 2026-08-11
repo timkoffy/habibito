@@ -29,13 +29,15 @@ void handle_move_left(struct habit_data *data, struct paint_info *paint_info) {
 }
 
 
-void handle_toggle_habit(struct habit_data *data, struct paint_info *paint_info) {
-    toggle_habit(paint_info->cur_pos_day, paint_info->cur_pos_habit, data);
+void handle_toggle_habit_value(struct habit_data *data, struct paint_info *paint_info) {
+    toggle_habit_value(paint_info->cur_pos_day, paint_info->cur_pos_habit, data);
     draw_calendar(data, paint_info);
 }
 
 
-void handle_add_label(bool *input_mode, struct habit_data *data, struct paint_info *paint_info) {
+void handle_add_label(bool *input_mode,
+                      struct habit_data *data, struct paint_info *paint_info) {
+
     if (data->labels_count < 8) {
         *input_mode = true;
         printf("\e[?25h"); // show cursor
@@ -47,7 +49,48 @@ void handle_add_label(bool *input_mode, struct habit_data *data, struct paint_in
 }
 
 
-void handle_info_mode(bool *info_mode, struct habit_data *data, struct paint_info *paint_info) {
+void handle_input(char input, 
+                  bool *input_mode, bool *is_any_letter, int *input_len, char *input_buf, 
+                  struct habit_data *data, struct paint_info *paint_info) {
+
+    if (input == ' ' && !(*is_any_letter)) return;
+
+    *is_any_letter = true;
+    
+    if (*input_len == MAX_LABEL_LENGTH || input == '\n') { // apply label
+        // reset all state variables
+        *input_mode = false;
+        *input_len = 0;
+        *is_any_letter = false;
+
+        printf("\e[?25l");
+        if (input == '\n') printf("\e[1A"); 
+        printf("\e[2K");
+        fflush(stdout);
+
+        // allocate memory for new label
+        data->labels[data->labels_count] = calloc(MAX_LABEL_LENGTH, 1);
+        memcpy(data->labels[data->labels_count], input_buf, MAX_LABEL_LENGTH);
+        memset(input_buf, 0, MAX_LABEL_LENGTH);
+        data->labels_count++;
+
+        calculate_paint_info(paint_info, paint_info->rows, paint_info->cols, data);
+        draw_screen(data, paint_info);
+        draw_calendar(data, paint_info);
+
+        return;
+    }
+    
+    write(STDOUT_FILENO, &input, 1);
+    memcpy((void*)input_buf + (*input_len), &input, 1);
+    
+    (*input_len)++;
+}
+
+
+void handle_info_mode(bool *info_mode, 
+                      struct habit_data *data, struct paint_info *paint_info) {
+
     *info_mode = !(*info_mode); 
     if (*info_mode) draw_info_screen(data, paint_info);
     else {

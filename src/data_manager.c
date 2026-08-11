@@ -111,7 +111,7 @@ void free_allocated_data(struct habit_data *data) {
     free(data->data);
 }
 
-void toggle_habit(int day_idx, int habit_idx, struct habit_data *data) {
+void toggle_habit_value(int day_idx, int habit_idx, struct habit_data *data) {
     int byte_idx = habit_idx / 8;
     int bit_idx = habit_idx % 8;
     change_bit(&data->data[day_idx][byte_idx], bit_idx);
