@@ -1,6 +1,7 @@
 #pragma once 
 
 #include <stdint.h>
+#include <time.h>
 
 struct habit_data {
     time_t start_time;

@@ -6,6 +6,7 @@
 #include "painter.h"
 #include "utils.h"
 #include "data_manager.h"
+#include "handler.h"
 
 void run() {
     setup_terminal();
@@ -29,8 +30,8 @@ void run() {
     bool is_any_letter = false;
 
     while (running) {
-        int count = read(STDIN_FILENO, &input, 1);
-        if (count > 0) {
+        int read_count = read(STDIN_FILENO, &input, 1);
+        if (read_count > 0) {
             if (input_mode) {
                 if (input == ' ' && !is_any_letter) continue;
 
@@ -69,55 +70,14 @@ void run() {
             } 
 
             switch (input) {
-                case 'h':
-                    if (paint_info.cur_pos_day > 0) {
-                        paint_info.cur_pos_day--;
-                        draw_calendar(&data, &paint_info);
-                    }
-                    break;
-                case 'l':
-                    if (paint_info.cur_pos_day + 1 < data.days_count) {
-                        paint_info.cur_pos_day++;
-                        draw_calendar(&data, &paint_info);
-                    } 
-                    break;
-                case 'k':
-                    if (paint_info.cur_pos_habit > 0) {
-                        paint_info.cur_pos_habit--;
-                        draw_calendar(&data, &paint_info);
-                    }
-                    break;
-                case 'j':
-                    if (paint_info.cur_pos_habit < data.labels_count - 1) {
-                        paint_info.cur_pos_habit++;
-                        draw_calendar(&data, &paint_info);
-                    }
-                    break;
-                case 'a':
-                    if (data.labels_count < 8) {
-                        input_mode = 1;
-                        printf("\e[?25h"); // show cursor
-                        move_cursor(0, HEADER_HEIGHT + data.labels_count + 1); 
-                        printf("\e[2K"); // erase from cursor to end of line
-                        printf("%d ", data.labels_count);
-                        fflush(stdout);
-                    }
-                    break;
-                case '\n': case 'i':
-                    toggle_habit(paint_info.cur_pos_day, paint_info.cur_pos_habit, &data);
-                    draw_calendar(&data, &paint_info);
-                    break;
-                case 'q':
-                    interrupt_handler(SIGINT);
-                    break;
-                case 's': // dev util to show values of all application data (like habit_data, paint_info)
-                    info_mode = !info_mode; 
-                    if (info_mode) draw_info_screen(&data, &paint_info);
-                    else {
-                        draw_screen(&data, &paint_info);
-                        draw_calendar(&data, &paint_info);
-                    }
-                    break;
+                case 'k': handle_move_up(&data, &paint_info); break;
+                case 'j': handle_move_down(&data, &paint_info); break;
+                case 'l': handle_move_right(&data, &paint_info); break;
+                case 'h': handle_move_left(&data, &paint_info); break;
+                case 'a': handle_add_label(&input_mode, &data, &paint_info); break;
+                case '\n': case 'i': handle_toggle_habit(&data, &paint_info); break;
+                case 'q': interrupt_handler(SIGINT); break;
+                case 's': handle_info_mode(&info_mode, &data, &paint_info); break; // dev util to show values of all application variables
             }
         }
     }
