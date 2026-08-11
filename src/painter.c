@@ -1,6 +1,6 @@
 #include "painter.h"
 
-void calculate_paint_info(struct paint_info *dest, unsigned short rows, unsigned short cols, struct habit_data *data) {
+void calculate_paint_info(struct paint_info *dest, int rows, int cols, struct habit_data *data) {
     dest->rows = rows;
     dest->cols = cols;
     dest->total_height = HEADER_HEIGHT + data->labels_count;
@@ -15,27 +15,27 @@ void calculate_paint_info(struct paint_info *dest, unsigned short rows, unsigned
 void draw_screen(struct habit_data *data, struct paint_info *paint_info) {
     printf("\e[%d;999H\e[1J\e[H", paint_info->rows - 1);
     fflush(stdout);
-    for (int i = 0; i < paint_info->rows; i++) {
-        if (i >= paint_info->total_height && i < paint_info->rows) {
+    for (int row_idx = 0; row_idx < paint_info->rows; row_idx++) {
+        if (row_idx >= paint_info->total_height && row_idx < paint_info->rows) {
             continue;
         }
 
-        for (int j = 0; j < paint_info->cols; j++) {
-            if (i == HEADER_HEIGHT - 1) { 
-                if (j == paint_info->first_column_width - 1) {
+        for (int col_idx = 0; col_idx < paint_info->cols; col_idx++) {
+            if (row_idx == HEADER_HEIGHT - 1) { 
+                if (col_idx == paint_info->first_column_width - 1) {
                     printf("+\n");
                     break;
                 }
                 printf("-");
                 continue;
             }
-            if (j == 0 && i >= HEADER_HEIGHT) {
-                int label_idx = i - HEADER_HEIGHT;
+            if (col_idx == 0 && row_idx >= HEADER_HEIGHT) {
+                int label_idx = row_idx - HEADER_HEIGHT;
                 printf("%d", label_idx);
-                j += printf(" %s", data->labels[label_idx]);
+                col_idx += printf(" %s", data->labels[label_idx]);
                 continue;
             }
-            if (j == paint_info->max_label_width + 3) {
+            if (col_idx == paint_info->max_label_width + 3) {
                 printf("|");
                 continue;
             }
@@ -61,15 +61,13 @@ void draw_calendar(struct habit_data *data, struct paint_info *paint_info) {
     time_t timestamp_tmp = timestamp_right - n_days * SECONDS_IN_DAY;
     int cur_day_tmp = paint_info->cur_pos_day + n_days / 2 - n_days;
 
-    // printf("info: capacity = %d, n_days = %d, n_weeks = %d, cur_day_tmp = %d\n", capacity, n_days, n_weeks_ceiled, cur_day_tmp);
-  
     // clear prev state of calendar
-    for (int i = 0; i < data->labels_count; i++) {
-        printf("\e[%d;%dH\e[0K", i + HEADER_HEIGHT + 1, paint_info->first_column_width + 1);
+    for (int label_idx = 0; label_idx < data->labels_count; label_idx++) {
+        printf("\e[%d;%dH\e[0K", label_idx + HEADER_HEIGHT + 1, paint_info->first_column_width + 1);
     }
     fflush(stdout);
 
-    for (int i = paint_info->first_column_width + 2; i < paint_info->cols - 1; i += paint_info->cells_per_day) {
+    for (int col_idx = paint_info->first_column_width + 2; col_idx < paint_info->cols - 1; col_idx += paint_info->cells_per_day) {
         struct tm *time_info;
         time_info = localtime(&timestamp_tmp);
         int weekday = time_info->tm_wday;
@@ -87,7 +85,7 @@ void draw_calendar(struct habit_data *data, struct paint_info *paint_info) {
         // data visual
         if (!no_data && cur_day_tmp >= 0 && cur_day_tmp < data->days_count) {
             for (int label_idx = 0; label_idx < data->labels_count; label_idx++) {
-                move_cursor(i - 1, label_idx + HEADER_HEIGHT + 1);
+                move_cursor(col_idx - 1, label_idx + HEADER_HEIGHT + 1);
                 if (paint_info->cur_pos_habit == label_idx && paint_info->cur_pos_day == cur_day_tmp) {
                     printf("\e[90m[\e[39m");
                 } else printf(" ");
@@ -105,24 +103,24 @@ void draw_calendar(struct habit_data *data, struct paint_info *paint_info) {
         }
 
         // calendar visual
-        move_cursor(i, 1);
+        move_cursor(col_idx, 1);
         printf("%02d ", monthday);
-        move_cursor(i, 2);
+        move_cursor(col_idx, 2);
         printf("%c  ", get_char_from_weekday(weekday));
-        move_cursor(i, 3); 
+        move_cursor(col_idx, 3); 
         printf("---");
 
-        if (weekday == 6 && i + 4 < paint_info->cols) {
-            move_cursor(i + paint_info->cells_per_week_border, 1);
+        if (weekday == 6 && col_idx + 4 < paint_info->cols) {
+            move_cursor(col_idx + paint_info->cells_per_week_border, 1);
             printf(" | ");
-            move_cursor(i + paint_info->cells_per_week_border, 2);
+            move_cursor(col_idx + paint_info->cells_per_week_border, 2);
             printf(" | ");
-            move_cursor(i + paint_info->cells_per_week_border, 3);
+            move_cursor(col_idx + paint_info->cells_per_week_border, 3);
             printf("-+-");
-            i += paint_info->cells_per_week_border;
+            col_idx += paint_info->cells_per_week_border;
             
-            for (int j = 0; j < data->labels_count; j++) {
-                move_cursor(i, j + HEADER_HEIGHT + 1);
+            for (int label_idx = 0; label_idx < data->labels_count; label_idx++) {
+                move_cursor(col_idx, label_idx + HEADER_HEIGHT + 1);
                 printf(" |");
             }
         }

@@ -1,13 +1,15 @@
 #pragma once 
 
+#include <stdint.h>
+
 struct habit_data {
-    time_t start_time; // unix timestamp
+    time_t start_time;
     time_t current_time;
-    unsigned short bytes_per_day;
+    int bytes_per_day;
     int days_count;
-    unsigned short labels_count;
-    unsigned short labels_buffer_count;
+    int labels_count;
+    int labels_buffer_count;
     char **labels;
-    unsigned char **data;
+    uint8_t **data;
     char *art_buffer;
 };

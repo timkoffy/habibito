@@ -2,12 +2,12 @@
 
 /* terminal utils */
 
-volatile short running = 1;
+volatile bool running = true;
 
 void interrupt_handler(int signum) {
     write(STDOUT_FILENO, "\e[?25h", 6);
     system("tput rmcup && stty icanon echo");
-    running = 0;
+    running = false;
 }
 
 struct winsize get_screen_size() {
@@ -34,16 +34,16 @@ void move_cursor(int col, int row) {
 
 /* visual utils */
 
-unsigned short max_label_width(char **labels, unsigned short labels_count) {
-    unsigned short res = MIN_LABEL_WIDTH;
+int max_label_width(char **labels, int labels_count) {
+    int res = MIN_LABEL_WIDTH;
 
-    for (unsigned short i = 0; i < labels_count; i++) {
-        for (unsigned short j = 0; j <= MAX_LABEL_LENGTH; j++) {
-            if (j == MAX_LABEL_LENGTH) {
+    for (int label_idx = 0; label_idx < labels_count; label_idx++) {
+        for (int char_idx = 0; char_idx <= MAX_LABEL_LENGTH; char_idx++) {
+            if (char_idx == MAX_LABEL_LENGTH) {
                 return MAX_LABEL_LENGTH;
             }
-            if (labels[i][j] == '\0') {
-                if (res < j) res = j;
+            if (labels[label_idx][char_idx] == '\0') {
+                if (res < char_idx) res = char_idx;
                 break;
             }
         }
@@ -52,16 +52,21 @@ unsigned short max_label_width(char **labels, unsigned short labels_count) {
     return res;
 }
 
+void print_error(const char *err) {
+    dprintf(STDOUT_FILENO, "\e[999;1H\e[2K\e[31mERROR: %s\e[39m", err);
+    fflush(stdout);
+}
+
 /* time visual utils */
 
 time_t ceil_timestamp_day(time_t timestamp) {
     return timestamp / SECONDS_IN_DAY * SECONDS_IN_DAY;
 }
 
-char get_char_from_weekday(unsigned short wd_idx) {
+char get_char_from_weekday(int weekday_idx) {
     const char weekdays[7] = {'s', 'm', 't', 'w', 't', 'f', 's'};
 
-    return weekdays[wd_idx];
+    return weekdays[weekday_idx];
 }
 
 int get_weekday_from_timestamp(time_t *timestamp) {
@@ -70,21 +75,14 @@ int get_weekday_from_timestamp(time_t *timestamp) {
     return time_info->tm_wday;
 }
 
-/* statistics utils */
-
-void print_error(const char *err) {
-    dprintf(STDOUT_FILENO, "\e[999;1H\e[2K\e[31mERROR: %s\e[39m", err);
-    fflush(stdout);
-}
-
 /* data utils */
 
-void change_bit(unsigned char *byte, int bit_idx) {
-    unsigned char mask = 0x1 << bit_idx;
+void change_bit(uint8_t *byte, int bit_idx) {
+    uint8_t mask = 0x1 << bit_idx;
     *byte ^= mask;
 }
 
-int is_bit_true(unsigned char *byte, int bit_idx) {
-    unsigned char mask = 0x1 << bit_idx;
+int is_bit_true(uint8_t *byte, int bit_idx) {
+    uint8_t mask = 0x1 << bit_idx;
     return *byte & mask;
 }

@@ -19,6 +19,6 @@ void save_data(struct habit_data *data);
 void free_allocated_data(struct habit_data *data);
 struct habit_data init_data(time_t current_time);
 
-void toggle_habit(unsigned int day, unsigned short habit_idx, struct habit_data *data);
+void toggle_habit(int day_idx, int habit_idx, struct habit_data *data);
 
 int parse_config_art(char *dest);

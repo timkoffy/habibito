@@ -1,5 +1,7 @@
 #include <stdio.h>
 #include <time.h>
+#include <stdint.h>
+#include <stdbool.h>
 
 #include "painter.h"
 #include "utils.h"
@@ -7,37 +9,38 @@
 
 void run() {
     setup_terminal();
-    struct winsize ws = get_screen_size();
+
     time_t current_time = time(NULL);
     struct habit_data data = load_data(current_time);
+
+    struct winsize ws = get_screen_size();
     struct paint_info paint_info;
-
-//    printf("%s, %d, %d, %d\n", asctime(localtime(&data.current_time)), data.bytes_per_day, data.labels_count, data.days_count);
-
     calculate_paint_info(&paint_info, ws.ws_row, ws.ws_col, &data);
+
     draw_screen(&data, &paint_info);
     draw_calendar(&data, &paint_info);
 
-    short input_mode = 0;
-    short input_len = 0;
-    short is_any_letter = 0;
+    bool input_mode = false;
+    bool info_mode = false;
+
+    int input_len = 0;
     char input;
     char input_buf[MAX_LABEL_LENGTH]; 
-
-    short is_info_screen = 0;
+    bool is_any_letter = false;
 
     while (running) {
         int count = read(STDIN_FILENO, &input, 1);
         if (count > 0) {
             if (input_mode) {
-                if (input == ' ' && is_any_letter == 0) continue;
+                if (input == ' ' && !is_any_letter) continue;
 
-                is_any_letter = 1;
+                is_any_letter = true;
                 
-                if (input_len == MAX_LABEL_LENGTH || input == '\n') {
-                    is_any_letter = 0;
+                if (input_len == MAX_LABEL_LENGTH || input == '\n') { // apply label
+                    // reset all state variables
+                    input_mode = false;
                     input_len = 0;
-                    input_mode = 0;
+                    is_any_letter = false;
 
                     printf("\e[?25l");
                     if (input == '\n') printf("\e[1A"); 
@@ -107,9 +110,9 @@ void run() {
                 case 'q':
                     interrupt_handler(SIGINT);
                     break;
-                case 's': // (aka. stat) dev util to show values of all application data (like habit_data, paint_info)
-                    is_info_screen = !is_info_screen; 
-                    if (is_info_screen) draw_info_screen(&data, &paint_info);
+                case 's': // dev util to show values of all application data (like habit_data, paint_info)
+                    info_mode = !info_mode; 
+                    if (info_mode) draw_info_screen(&data, &paint_info);
                     else {
                         draw_screen(&data, &paint_info);
                         draw_calendar(&data, &paint_info);

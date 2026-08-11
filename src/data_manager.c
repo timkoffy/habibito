@@ -25,23 +25,23 @@ struct habit_data load_data(time_t current_time) {
     }
 
     data.labels = malloc(sizeof(char*) * data.labels_buffer_count);
-    for (int i = 0; i < data.labels_buffer_count; i++) {
-        if (i < data.labels_count) {
-            data.labels[i] = malloc(MAX_LABEL_LENGTH);
-            read(fd, data.labels[i], MAX_LABEL_LENGTH);
+    for (int label_idx = 0; label_idx < data.labels_buffer_count; label_idx++) {
+        if (label_idx < data.labels_count) {
+            data.labels[label_idx] = malloc(MAX_LABEL_LENGTH);
+            read(fd, data.labels[label_idx], MAX_LABEL_LENGTH);
         } else {
-            data.labels[i] = NULL;
+            data.labels[label_idx] = NULL;
             lseek(fd, MAX_LABEL_LENGTH, SEEK_CUR);
         }
     }
 
-    data.data = malloc(sizeof(char*) * data.days_count);
-    for(int i = 0; i < data.days_count; i++) {
-        if (i < days_count_prev) {
-            data.data[i] = malloc(data.bytes_per_day);
-            read(fd, data.data[i], data.bytes_per_day);
+    data.data = malloc(sizeof(uint8_t*) * data.days_count);
+    for(int day_idx = 0; day_idx < data.days_count; day_idx++) {
+        if (day_idx < days_count_prev) {
+            data.data[day_idx] = malloc(data.bytes_per_day);
+            read(fd, data.data[day_idx], data.bytes_per_day);
         } else {
-            data.data[i] = calloc(data.bytes_per_day, 1);
+            data.data[day_idx] = calloc(data.bytes_per_day, 1);
         }
     }
 
@@ -64,13 +64,13 @@ struct habit_data init_data(time_t current_time) {
     data.labels_buffer_count = data.bytes_per_day * 8;
     
     data.labels = malloc(sizeof(char*) * data.labels_buffer_count);
-    for (int i = 0; i < data.labels_buffer_count; i++) {
-        data.labels[i] = NULL;
+    for (int label_idx = 0; label_idx < data.labels_buffer_count; label_idx++) {
+        data.labels[label_idx] = NULL;
     }
 
-    data.data = malloc(sizeof(char*) * data.days_count);
-    for(int i = 0; i < data.days_count; i++) {
-        data.data[i] = calloc(data.bytes_per_day, 1);
+    data.data = malloc(sizeof(uint8_t*) * data.days_count);
+    for(int day_idx = 0; day_idx < data.days_count; day_idx++) {
+        data.data[day_idx] = calloc(data.bytes_per_day, 1);
     }
     
     return data;
@@ -87,34 +87,34 @@ void save_data(struct habit_data *data) {
     write(fd, &data->bytes_per_day, sizeof(data->bytes_per_day));
     write(fd, &data->labels_count, sizeof(data->labels_count));
     
-    for (int i = 0; i < data->labels_buffer_count; i++) {
-        if (i < data->labels_count) write(fd, data->labels[i], MAX_LABEL_LENGTH);
+    for (int label_idx = 0; label_idx < data->labels_buffer_count; label_idx++) {
+        if (label_idx < data->labels_count) write(fd, data->labels[label_idx], MAX_LABEL_LENGTH);
         else lseek(fd, MAX_LABEL_LENGTH, SEEK_CUR);
     }
 
-    for (int i = 0; i < data->days_count; i++) {
-        write(fd, data->data[i], data->bytes_per_day);
+    for (int day_idx = 0; day_idx < data->days_count; day_idx++) {
+        write(fd, data->data[day_idx], data->bytes_per_day);
     }
     
     close(fd);
 }
 
 void free_allocated_data(struct habit_data *data) {
-    for (int i = 0; i < data->labels_buffer_count; i++) {
-        if (data->labels[i] != NULL) free(data->labels[i]);
+    for (int label_idx = 0; label_idx < data->labels_buffer_count; label_idx++) {
+        if (data->labels[label_idx] != NULL) free(data->labels[label_idx]);
     }
     free(data->labels);
 
-    for(int i = 0; i < data->days_count; i++) {
-        free(data->data[i]);
+    for(int day_idx = 0; day_idx < data->days_count; day_idx++) {
+        free(data->data[day_idx]);
     }
     free(data->data);
 }
 
-void toggle_habit(unsigned int day, unsigned short habit_idx, struct habit_data *data) {
+void toggle_habit(int day_idx, int habit_idx, struct habit_data *data) {
     int byte_idx = habit_idx / 8;
     int bit_idx = habit_idx % 8;
-    change_bit(&data->data[day][byte_idx], bit_idx);
+    change_bit(&data->data[day_idx][byte_idx], bit_idx);
 }
 
 int parse_config_art(char *dest) {
