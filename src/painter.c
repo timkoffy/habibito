@@ -43,7 +43,7 @@ void draw_screen(struct habit_data *data, struct paint_info *paint_info) {
         }
     }
     if (data->labels_count == 0) {
-        move_cursor(0, paint_info->total_height + 1);
+        move_cursor(paint_info->total_height + 1, 0);
         printf("press 'a' to add habit...");
     }
 
@@ -85,7 +85,7 @@ void draw_calendar(struct habit_data *data, struct paint_info *paint_info) {
         // data visual
         if (!no_data && cur_day_tmp >= 0 && cur_day_tmp < data->days_count) {
             for (int label_idx = 0; label_idx < data->labels_count; label_idx++) {
-                move_cursor(col_idx - 1, label_idx + HEADER_HEIGHT + 1);
+                move_cursor(label_idx + HEADER_HEIGHT + 1, col_idx - 1);
                 if (paint_info->cur_pos_habit == label_idx && paint_info->cur_pos_day == cur_day_tmp) {
                     printf("\e[90m[\e[39m");
                 } else printf(" ");
@@ -103,24 +103,24 @@ void draw_calendar(struct habit_data *data, struct paint_info *paint_info) {
         }
 
         // calendar visual
-        move_cursor(col_idx, 1);
+        move_cursor(1, col_idx);
         printf("%02d ", monthday);
-        move_cursor(col_idx, 2);
+        move_cursor(2, col_idx);
         printf("%c  ", get_char_from_weekday(weekday));
-        move_cursor(col_idx, 3); 
+        move_cursor(3, col_idx); 
         printf("---");
 
         if (weekday == 6 && col_idx + 4 < paint_info->cols) {
-            move_cursor(col_idx + paint_info->cells_per_week_border, 1);
+            move_cursor(1, col_idx + paint_info->cells_per_week_border);
             printf(" | ");
-            move_cursor(col_idx + paint_info->cells_per_week_border, 2);
+            move_cursor(2, col_idx + paint_info->cells_per_week_border);
             printf(" | ");
-            move_cursor(col_idx + paint_info->cells_per_week_border, 3);
+            move_cursor(3, col_idx + paint_info->cells_per_week_border);
             printf("-+-");
             col_idx += paint_info->cells_per_week_border;
             
             for (int label_idx = 0; label_idx < data->labels_count; label_idx++) {
-                move_cursor(col_idx, label_idx + HEADER_HEIGHT + 1);
+                move_cursor(label_idx + HEADER_HEIGHT + 1, col_idx);
                 printf(" |");
             }
         }
@@ -176,6 +176,6 @@ void draw_info_screen(struct habit_data *data, struct paint_info *paint_info) {
 void draw_art(struct habit_data *data, struct paint_info *paint_info) {
     move_cursor(1, 1);
     write(STDOUT_FILENO, data->art_buffer, paint_info->first_column_width - 1);
-    move_cursor(1, 2);
+    move_cursor(2, 1);
     write(STDOUT_FILENO, data->art_buffer + MAX_ART_WIDTH, paint_info->first_column_width - 1);
 }

@@ -41,7 +41,7 @@ void add_label_handler(bool *input_mode,
     if (data->labels_count < 8) {
         *input_mode = true;
         printf("\e[?25h"); // show cursor
-        move_cursor(0, HEADER_HEIGHT + data->labels_count + 1); 
+        move_cursor(HEADER_HEIGHT + data->labels_count + 1, 0); 
         printf("\e[2K"); // erase from cursor to end of line
         printf("%d ", data->labels_count);
         fflush(stdout);

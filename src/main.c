@@ -8,8 +8,10 @@
 #include "handler.h"
 
 void run() {
+    /* prepare terminal */
     setup_terminal();
 
+    /* prepare data */
     char *data_path = get_data_path();
     char *config_path = get_config_path();
 
@@ -20,9 +22,11 @@ void run() {
     struct paint_info paint_info;
     calculate_paint_info(&paint_info, ws.ws_row, ws.ws_col, &data);
 
+    /* initial render screen */
     draw_screen(&data, &paint_info);
     draw_calendar(&data, &paint_info);
 
+    /* state variables */
     bool input_mode = false;
     bool info_mode = false;
 
@@ -31,9 +35,9 @@ void run() {
     char input_buf[MAX_LABEL_LENGTH]; 
     bool is_any_letter = false;
 
+    /* main loop */
     while (running) {
-        int read_count = read(STDIN_FILENO, &input, 1);
-        if (read_count > 0) {
+        if (read(STDIN_FILENO, &input, 1)) {
             if (input_mode) {
                 input_handler(input, &input_mode, &is_any_letter, &input_len, input_buf, &data, &paint_info);
                 continue;
@@ -52,6 +56,7 @@ void run() {
         }
     }
 
+    /* exit from application */
     save_data(data_path, &data);
     free_allocated_data(&data);
     free(data_path);

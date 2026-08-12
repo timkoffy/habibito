@@ -1,6 +1,5 @@
 #include "utils.h"
 
-/* terminal utils */
 
 volatile bool running = true;
 
@@ -27,12 +26,11 @@ void setup_terminal() {
     write(STDOUT_FILENO, "\e[?25l", 6);
 }
 
-void move_cursor(int col, int row) {
+void move_cursor(int row, int col) {
     printf("\e[%d;%dH", row, col);
     fflush(stdout);
 }
 
-/* visual utils */
 
 int max_label_width(char **labels, int labels_count) {
     int res = MIN_LABEL_WIDTH;
@@ -57,7 +55,6 @@ void print_error(const char *err) {
     fflush(stdout);
 }
 
-/* time visual utils */
 
 time_t ceil_timestamp_day(time_t timestamp) {
     return timestamp / SECONDS_IN_DAY * SECONDS_IN_DAY;
@@ -75,7 +72,6 @@ int get_weekday_from_timestamp(time_t *timestamp) {
     return time_info->tm_wday;
 }
 
-/* data utils */
 
 void change_bit(uint8_t *byte, int bit_idx) {
     uint8_t mask = 0x1 << bit_idx;
