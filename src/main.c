@@ -1,4 +1,3 @@
-#include <stdio.h>
 #include <time.h>
 #include <stdint.h>
 #include <stdbool.h>
@@ -36,18 +35,19 @@ void run() {
         int read_count = read(STDIN_FILENO, &input, 1);
         if (read_count > 0) {
             if (input_mode) {
-                handle_input(input, &input_mode, &is_any_letter, &input_len, input_buf, &data, &paint_info);
+                input_handler(input, &input_mode, &is_any_letter, &input_len, input_buf, &data, &paint_info);
                 continue;
             } 
 
             switch (input) {
-                case 'k': handle_move_up(&data, &paint_info); break; case 'j': handle_move_down(&data, &paint_info); break;
-                case 'l': handle_move_right(&data, &paint_info); break;
-                case 'h': handle_move_left(&data, &paint_info); break;
-                case 'a': handle_add_label(&input_mode, &data, &paint_info); break;
-                case '\n': case 'i': handle_toggle_habit_value(&data, &paint_info); break;
+                case 'k': move_up_handler(&data, &paint_info); break; 
+                case 'j': move_down_handler(&data, &paint_info); break;
+                case 'l': move_right_handler(&data, &paint_info); break;
+                case 'h': move_left_handler(&data, &paint_info); break;
+                case 'a': add_label_handler(&input_mode, &data, &paint_info); break;
+                case '\n': case 'i': toggle_habit_value_handler(&data, &paint_info); break;
                 case 'q': interrupt_handler(SIGINT); break;
-                case 's': handle_info_mode(&info_mode, &data, &paint_info); break; // dev util to show values of all application variables
+                case 's': info_mode_handler(&info_mode, &data, &paint_info); break; // dev util to show values of all application variables
             }
         }
     }
