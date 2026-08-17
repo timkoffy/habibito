@@ -2,6 +2,7 @@
 
 #include "habit_data.h"
 #include "painter.h"
+#include "utils.h"
 
 void move_up_handler(struct habit_data *data, struct paint_info *paint_info);
 void move_down_handler(struct habit_data *data, struct paint_info *paint_info);

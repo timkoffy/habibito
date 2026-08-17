@@ -1,4 +1,5 @@
 #include "handler.h"
+#include "painter.h"
 
 void move_up_handler(struct habit_data *data, struct paint_info *paint_info) {
     if (paint_info->cur_pos_habit > 0) {
@@ -74,7 +75,7 @@ void input_handler(char input,
         memset(input_buf, 0, MAX_LABEL_LENGTH);
         data->labels_count++;
 
-        calculate_paint_info(paint_info, paint_info->rows, paint_info->cols, data);
+        calculate_paint_info(paint_info, data);
         draw_screen(data, paint_info);
         draw_calendar(data, paint_info);
 
@@ -94,6 +95,7 @@ void info_mode_handler(bool *info_mode,
     *info_mode = !(*info_mode); 
     if (*info_mode) draw_info_screen(data, paint_info);
     else {
+        calculate_paint_info(paint_info, data);
         draw_screen(data, paint_info);
         draw_calendar(data, paint_info);
     }

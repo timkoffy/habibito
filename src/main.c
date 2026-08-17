@@ -18,9 +18,8 @@ void run() {
     time_t current_time = time(NULL);
     struct habit_data data = load_data(data_path, config_path, current_time);
 
-    struct winsize ws = get_screen_size();
     struct paint_info paint_info;
-    calculate_paint_info(&paint_info, ws.ws_row, ws.ws_col, &data);
+    calculate_paint_info(&paint_info, &data);
 
     /* initial render screen */
     draw_screen(&data, &paint_info);

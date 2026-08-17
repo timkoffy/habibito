@@ -1,8 +1,10 @@
 #include "painter.h"
+#include "utils.h"
 
-void calculate_paint_info(struct paint_info *dest, int rows, int cols, struct habit_data *data) {
-    dest->rows = rows;
-    dest->cols = cols;
+void calculate_paint_info(struct paint_info *dest, struct habit_data *data) {
+    struct winsize ws = get_screen_size(); 
+    dest->rows = ws.ws_row;
+    dest->cols = ws.ws_col;
     dest->total_height = HEADER_HEIGHT + data->labels_count;
     dest->max_label_width = max_label_width(data->labels, data->labels_count);
     dest->first_column_width = dest->max_label_width + 4;

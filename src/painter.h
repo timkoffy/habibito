@@ -18,7 +18,7 @@ struct paint_info {
     int cur_pos_habit;
 };
 
-void calculate_paint_info(struct paint_info *dest, int rows, int cols, struct habit_data *data);
+void calculate_paint_info(struct paint_info *dest, struct habit_data *data);
 void draw_screen(struct habit_data *data, struct paint_info *paint_info);
 void draw_calendar(struct habit_data *data, struct paint_info *paint_info);
 void draw_info_screen(struct habit_data *data, struct paint_info *paint_info);
