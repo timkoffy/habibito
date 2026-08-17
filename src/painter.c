@@ -1,18 +1,4 @@
 #include "painter.h"
-#include "utils.h"
-
-void calculate_paint_info(struct paint_info *dest, struct habit_data *data) {
-    struct winsize ws = get_screen_size(); 
-    dest->rows = ws.ws_row;
-    dest->cols = ws.ws_col;
-    dest->total_height = HEADER_HEIGHT + data->labels_count;
-    dest->max_label_width = max_label_width(data->labels, data->labels_count);
-    dest->first_column_width = dest->max_label_width + 4;
-    dest->cells_per_day = 3;
-    dest->cells_per_week_border = 2;
-    dest->cur_pos_day = data->days_count - 1;
-    dest->cur_pos_habit = 0;
-}
 
 void draw_screen(struct habit_data *data, struct paint_info *paint_info) {
     printf("\e[%d;999H\e[1J\e[H", paint_info->rows - 1);
